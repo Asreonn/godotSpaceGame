@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://bonm5vusaahfb"]
+
+[ext_resource type="PackedScene" uid="uid://bon0pgrw321t6" path="res://Scenes/player.tscn" id="1_ebmjs"]
+[ext_resource type="Texture2D" uid="uid://bmt5drg52b1y4" path="res://Assets/Rectangle 30.png" id="2_qxrlw"]
+
+[node name="Game" type="Node2D" unique_id=1416389338]
+
+[node name="Player" parent="." unique_id=1817178464 instance=ExtResource("1_ebmjs")]
+
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=2050608104]
+
+[node name="Rectangle30" type="Sprite2D" parent="." unique_id=298940484]
+position = Vector2(190, 21)
+texture = ExtResource("2_qxrlw")

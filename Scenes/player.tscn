@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://bon0pgrw321t6"]
+
+[ext_resource type="Script" uid="uid://dxdjbn8cs3uuc" path="res://Scripts/playerMovement.gd" id="1_cvnsp"]
+[ext_resource type="Texture2D" uid="uid://b8n41be76b41u" path="res://Assets/PlayerGFX.png" id="1_f50pn"]
+
+[node name="Player" type="CharacterBody2D" unique_id=1817178464]
+script = ExtResource("1_cvnsp")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1435229646]
+modulate = Color(0.24585843, 0.635327, 0.8496578, 1)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_f50pn")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1247993346]
+polygon = PackedVector2Array(23, 20, 0, -20, -23, 20)
