@@ -2,8 +2,34 @@
 
 [ext_resource type="PackedScene" uid="uid://bon0pgrw321t6" path="res://Scenes/player.tscn" id="1_ebmjs"]
 [ext_resource type="Texture2D" uid="uid://bmt5drg52b1y4" path="res://Assets/Rectangle 30.png" id="2_qxrlw"]
+[ext_resource type="Script" uid="uid://cdj0v7hdbvhdu" path="res://Scripts/star_field.gd" id="3_starfield"]
 
 [node name="Game" type="Node2D" unique_id=1416389338]
+
+[node name="StarField" type="ParallaxBackground" parent="." unique_id=1405674122]
+layer = -1
+script = ExtResource("3_starfield")
+player_path = NodePath("../Player")
+
+[node name="BackgroundColor" type="ColorRect" parent="StarField" unique_id=1681320822]
+z_index = -10
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.18, 0.12, 0.26, 1)
+
+[node name="LayerFar" type="ParallaxLayer" parent="StarField" unique_id=868756702]
+
+[node name="Stars" type="Node2D" parent="StarField/LayerFar" unique_id=1191359745]
+
+[node name="LayerMid" type="ParallaxLayer" parent="StarField" unique_id=442154733]
+
+[node name="Stars" type="Node2D" parent="StarField/LayerMid" unique_id=224985786]
+
+[node name="LayerNear" type="ParallaxLayer" parent="StarField" unique_id=1884976300]
+
+[node name="Stars" type="Node2D" parent="StarField/LayerNear" unique_id=1319291342]
 
 [node name="Player" parent="." unique_id=1817178464 instance=ExtResource("1_ebmjs")]
 
