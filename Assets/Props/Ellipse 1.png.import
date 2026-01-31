@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bmt5drg52b1y4"
-path="res://.godot/imported/Rectangle 30.png-7f7e302ca13abdfbf0039658f96d49b3.ctex"
+uid="uid://bqhlxks243jcv"
+path="res://.godot/imported/Ellipse 1.png-08e5b5f4c0a08286d7cb5fd2061e25a2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Rectangle 30.png"
-dest_files=["res://.godot/imported/Rectangle 30.png-7f7e302ca13abdfbf0039658f96d49b3.ctex"]
+source_file="res://Assets/Props/Ellipse 1.png"
+dest_files=["res://.godot/imported/Ellipse 1.png-08e5b5f4c0a08286d7cb5fd2061e25a2.ctex"]
 
 [params]
 

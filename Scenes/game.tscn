@@ -1,8 +1,13 @@
 [gd_scene format=3 uid="uid://bonm5vusaahfb"]
 
-[ext_resource type="PackedScene" uid="uid://bon0pgrw321t6" path="res://Scenes/player.tscn" id="1_ebmjs"]
-[ext_resource type="Texture2D" uid="uid://bmt5drg52b1y4" path="res://Assets/Rectangle 30.png" id="2_qxrlw"]
-[ext_resource type="Script" uid="uid://cdj0v7hdbvhdu" path="res://Scripts/star_field.gd" id="3_starfield"]
+[ext_resource type="PackedScene" uid="uid://bon0pgrw321t6" path="res://Scenes/Player/player.tscn" id="1_ebmjs"]
+[ext_resource type="PackedScene" uid="uid://cb7rf7ls32wb5" path="res://Scenes/Environment/asteroid.tscn" id="2_asteroid"]
+[ext_resource type="Script" uid="uid://cdj0v7hdbvhdu" path="res://Scripts/Environment/star_field.gd" id="3_starfield"]
+[ext_resource type="Script" uid="uid://kpl16pjr0lvs" path="res://Scripts/Camera/smooth_camera.gd" id="4_smoothcam"]
+[ext_resource type="Script" uid="uid://dm7hcsjw28pw5" path="res://Scripts/Environment/asteroid_field.gd" id="5_asteroidfield"]
+
+[sub_resource type="Environment" id="Environment_3dryh"]
+glow_enabled = true
 
 [node name="Game" type="Node2D" unique_id=1416389338]
 
@@ -16,6 +21,8 @@ z_index = -10
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 color = Color(0.18, 0.12, 0.26, 1)
 
@@ -31,10 +38,37 @@ color = Color(0.18, 0.12, 0.26, 1)
 
 [node name="Stars" type="Node2D" parent="StarField/LayerNear" unique_id=1319291342]
 
+[node name="AsteroidField" type="Node2D" parent="." unique_id=630363580]
+script = ExtResource("5_asteroidfield")
+player_path = NodePath("../Player")
+
+[node name="Asteroids" type="Node2D" parent="AsteroidField"]
+
+[node name="Asteroid1" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
+
+[node name="Asteroid2" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
+
+[node name="Asteroid3" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
+
+[node name="Asteroid4" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
+
+[node name="Asteroid5" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
+
+[node name="Asteroid6" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
+
+[node name="Asteroid7" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
+
+[node name="Asteroid8" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
+
+[node name="Asteroid9" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
+
+[node name="Asteroid10" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
+
 [node name="Player" parent="." unique_id=1817178464 instance=ExtResource("1_ebmjs")]
 
-[node name="Camera2D" type="Camera2D" parent="Player" unique_id=2050608104]
+[node name="SmoothCamera" type="Camera2D" parent="." unique_id=891574962]
+script = ExtResource("4_smoothcam")
+target_path = NodePath("../Player")
 
-[node name="Rectangle30" type="Sprite2D" parent="." unique_id=298940484]
-position = Vector2(190, 21)
-texture = ExtResource("2_qxrlw")
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2077198092]
+environment = SubResource("Environment_3dryh")

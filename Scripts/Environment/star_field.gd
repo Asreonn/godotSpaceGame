@@ -1,7 +1,5 @@
 extends ParallaxBackground
 
-const StarTwinkle = preload("res://Scripts/star_twinkle.gd")
-
 @export var spawn_rect_size := Vector2(2400, 1400)
 @export var layer_counts := PackedInt32Array([45, 30, 20])
 @export var layer_motion_scales: Array[Vector2] = [
@@ -10,17 +8,18 @@ const StarTwinkle = preload("res://Scripts/star_twinkle.gd")
 	Vector2(0.7, 0.7)
 ]
 @export var layer_scale_ranges: Array[Vector2] = [
-	Vector2(0.15, 0.35),
-	Vector2(0.25, 0.55),
-	Vector2(0.4, 0.8)
+	Vector2(0.08, 0.18),
+	Vector2(0.12, 0.30),
+	Vector2(0.20, 0.45)
 ]
-@export var twinkle_speed_range := Vector2(1.6, 2.4)
-@export var rotation_speed_range := Vector2(-1.2, 1.2)
+@export var twinkle_speed_range := Vector2(0.5, 1.0)
+@export var rotation_speed_range := Vector2(-0.4, 0.4)
 @export var brightness_range := Vector2(0.45, 0.8)
 @export var seed := 0
 @export var use_player_center := true
 @export var player_path: NodePath
-@export var star_texture: Texture2D = preload("res://Assets/Background/Star.png")
+@export var star_scene: PackedScene = preload("res://Scenes/Environment/star.tscn")
+@export var star_texture: Texture2D = preload("res://Assets/Environment/Star.png")
 
 var _rng := RandomNumberGenerator.new()
 var _rect_size := Vector2.ZERO
@@ -34,7 +33,7 @@ func _ready() -> void:
 	_rect_size = _get_rect_size()
 	var center := _get_spawn_center()
 	if star_texture == null:
-		star_texture = preload("res://Assets/Background/Star.png")
+		star_texture = preload("res://Assets/Environment/Star.png")
 
 	var layers := _get_layers()
 	for i in range(layers.size()):
@@ -120,8 +119,7 @@ func _spawn_star(
 	var spawn_center := center
 	if use_player_center:
 		spawn_center = Vector2(center.x * motion_scale.x, center.y * motion_scale.y)
-	var star := StarTwinkle.new()
-	star.centered = true
+	var star := star_scene.instantiate()
 	star.position = spawn_center + Vector2(
 		_rng.randf_range(-rect_size.x * 0.5, rect_size.x * 0.5),
 		_rng.randf_range(-rect_size.y * 0.5, rect_size.y * 0.5)
