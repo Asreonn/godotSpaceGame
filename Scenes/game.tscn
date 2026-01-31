@@ -8,11 +8,16 @@
 
 [sub_resource type="Environment" id="Environment_3dryh"]
 glow_enabled = true
+glow_intensity = 0.8
+glow_strength = 1.2
+glow_bloom = 0.3
+glow_blend_mode = 0
 
 [node name="Game" type="Node2D" unique_id=1416389338]
 
 [node name="StarField" type="ParallaxBackground" parent="." unique_id=1405674122]
 layer = -1
+scroll_ignore_camera_zoom = true
 script = ExtResource("3_starfield")
 player_path = NodePath("../Player")
 

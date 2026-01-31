@@ -1,12 +1,14 @@
 extends Node2D
 
-@export var spawn_interval := 3.0
-@export var max_asteroids := 40
-@export var spawn_min_distance := 800.0
-@export var spawn_max_distance := 1000.0
-@export var despawn_distance := 1500.0
+@export var spawn_interval := 0.8  # ÇOK sık spawn!
+@export var max_asteroids := 120  # Çok fazla asteroid!
+@export var camera_max_zoom := 5.0  # Kameranın max zoom out seviyesi
+@export var spawn_min_distance := 1200.0  # Oyuncuya YAKIN spawn (çok azaltıldı!)
+@export var spawn_max_distance := 2500.0  # Oyuncuya YAKIN spawn (çok azaltıldı!)
+@export var despawn_distance := 4000.0  # Daha yakın despawn
 @export var speed_range := Vector2(20.0, 60.0)
 @export var rotation_speed_range := Vector2(-0.3, 0.3)
+@export var scale_range := Vector2(0.4, 1.2)  # Rastgele asteroid boyutu (küçültülmüş)
 @export var player_path: NodePath
 
 var _active_asteroids: Array[Area2D] = []
@@ -44,6 +46,7 @@ func _spawn_asteroid() -> void:
 	var asteroid = _pool.pop_back()
 	_place_asteroid_around_player(asteroid)
 	_randomize_motion(asteroid)
+	_randomize_scale(asteroid)
 	_activate_asteroid(asteroid)
 
 	_active_asteroids.append(asteroid)
@@ -55,14 +58,20 @@ func _on_asteroid_destroyed(asteroid: Area2D) -> void:
 
 func _check_despawn() -> void:
 	var player_pos := _player.global_position
+	# SABİT despawn mesafesi - her zaman max zoom (5.0x) için optimize
 	var despawn_distance_sq := despawn_distance * despawn_distance
 
 	for i in range(_active_asteroids.size() - 1, -1, -1):
 		var asteroid = _active_asteroids[i]
 		if asteroid and player_pos.distance_squared_to(asteroid.global_position) > despawn_distance_sq:
 			_active_asteroids.remove_at(i)
-			_deactivate_asteroid(asteroid)
-			_pool.append(asteroid)
+			# Fade out animasyonu başlat
+			if asteroid.has_method("start_fadeout"):
+				asteroid.start_fadeout()
+			else:
+				# Fallback - eski yöntem
+				_deactivate_asteroid(asteroid)
+				_pool.append(asteroid)
 
 func _collect_asteroids(root: Node) -> void:
 	for child in root.get_children():
@@ -70,11 +79,13 @@ func _collect_asteroids(root: Node) -> void:
 			_activate_asteroid(child)
 			_place_asteroid_around_player(child)
 			_randomize_motion(child)
+			_randomize_scale(child)
 			_active_asteroids.append(child)
 		_collect_asteroids(child)
 
 func _place_asteroid_around_player(asteroid: Area2D) -> void:
 	var angle := _rng.randf() * TAU
+	# SABİT mesafeler - her zaman max zoom (5.0x) için optimize
 	var radius := _rng.randf_range(spawn_min_distance, spawn_max_distance)
 	asteroid.global_position = _player.global_position + Vector2.from_angle(angle) * radius
 
@@ -82,6 +93,20 @@ func _randomize_motion(asteroid: Area2D) -> void:
 	var velocity := Vector2.from_angle(_rng.randf() * TAU) * _rng.randf_range(speed_range.x, speed_range.y)
 	var rot_speed := _rng.randf_range(rotation_speed_range.x, rotation_speed_range.y)
 	asteroid.configure_motion(velocity, rot_speed)
+
+func _randomize_scale(asteroid: Area2D) -> void:
+	# Rastgele boyut ata (1.5 - 8.0 arası)
+	var random_scale := _rng.randf_range(scale_range.x, scale_range.y)
+	asteroid.scale = Vector2.ONE * random_scale
+	
+	# Generation'ı sıfırla (bu yeni spawn edilen orijinal asteroid)
+	if asteroid.has_method("set"):
+		asteroid.generation = 0
+	
+	# Health'i yeniden hesapla
+	if asteroid.has_method("_apply_health_from_scale"):
+		asteroid._apply_health_from_scale(random_scale)
+		asteroid.current_health = asteroid.max_health
 
 func _activate_asteroid(asteroid: Area2D) -> void:
 	asteroid.visible = true
