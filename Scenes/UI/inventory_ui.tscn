@@ -157,20 +157,23 @@ theme_override_font_sizes/font_size = 15
 
 [node name="ShipCapBar" type="HBoxContainer" parent="Root/ShipPanel/ShipContent"]
 layout_mode = 2
-theme_override_constants/separation = 8
+size_flags_horizontal = 3
+alignment = 1
+theme_override_constants/separation = 10
 
 [node name="ShipCapLabel" type="Label" parent="Root/ShipPanel/ShipContent/ShipCapBar"]
 layout_mode = 2
 text = "0 / 50"
-custom_minimum_size = Vector2(96, 0)
+custom_minimum_size = Vector2(104, 0)
 horizontal_alignment = 2
+vertical_alignment = 1
 theme_override_colors/font_color = Color(0.7, 0.82, 0.95, 1)
 theme_override_font_sizes/font_size = 12
 
 [node name="ShipCapProgress" type="ProgressBar" parent="Root/ShipPanel/ShipContent/ShipCapBar"]
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 8)
+custom_minimum_size = Vector2(0, 10)
 max_value = 50.0
 show_percentage = false
 theme_override_styles/background = SubResource("StyleBoxFlat_progress_bg")
@@ -216,20 +219,23 @@ theme_override_font_sizes/font_size = 15
 
 [node name="BaseCapBar" type="HBoxContainer" parent="Root/BasePanel/BaseContent"]
 layout_mode = 2
-theme_override_constants/separation = 8
+size_flags_horizontal = 3
+alignment = 1
+theme_override_constants/separation = 10
 
 [node name="BaseCapLabel" type="Label" parent="Root/BasePanel/BaseContent/BaseCapBar"]
 layout_mode = 2
 text = "0 / 200"
-custom_minimum_size = Vector2(96, 0)
+custom_minimum_size = Vector2(104, 0)
 horizontal_alignment = 2
+vertical_alignment = 1
 theme_override_colors/font_color = Color(0.7, 0.82, 0.95, 1)
 theme_override_font_sizes/font_size = 12
 
 [node name="BaseCapProgress" type="ProgressBar" parent="Root/BasePanel/BaseContent/BaseCapBar"]
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 8)
+custom_minimum_size = Vector2(0, 10)
 max_value = 200.0
 show_percentage = false
 theme_override_styles/background = SubResource("StyleBoxFlat_progress_bg")
