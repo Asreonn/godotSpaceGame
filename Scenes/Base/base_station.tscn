@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scenes/Base/base_station.gd" id="1_base"]
+[ext_resource type="Script" path="res://Scenes/Inventory/inventory_component.gd" id="2_inventory"]
+
+[node name="BaseStation" type="Node2D"]
+script = ExtResource("1_base")
+
+[node name="Visual" type="ColorRect" parent="."]
+offset_left = -40.0
+offset_top = -40.0
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0.2, 0.6, 0.9, 0.7)
+
+[node name="BaseInventory" type="Node" parent="."]
+script = ExtResource("2_inventory")
+max_capacity = 200
+
+[node name="TriggerArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 1
+monitoring = true
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TriggerArea"]

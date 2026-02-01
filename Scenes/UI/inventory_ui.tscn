@@ -1,0 +1,269 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://Scenes/UI/inventory_ui.gd" id="1_script"]
+[ext_resource type="Script" path="res://Scenes/UI/inventory_drop_root.gd" id="2_root_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_window"]
+content_margin_left = 16.0
+content_margin_top = 14.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.05, 0.08, 0.12, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.3, 0.42, 0.75)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+bg_color = Color(0.07, 0.11, 0.17, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.32, 0.45, 0.65)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_action"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+bg_color = Color(0.06, 0.09, 0.14, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.3, 0.42, 0.7)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_primary"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.12, 0.62, 0.72, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.78, 0.9, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_secondary"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.12, 0.16, 0.22, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.4, 0.52, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_danger"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.75, 0.2, 0.15, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.35, 0.28, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_bg"]
+bg_color = Color(0.05, 0.07, 0.1, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.3, 0.4, 0.6)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="InventoryUI" type="CanvasLayer"]
+layer = 101
+script = ExtResource("1_script")
+
+[node name="Root" type="Control" parent="."]
+anchors_preset = 15
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+script = ExtResource("2_root_script")
+
+[node name="ShipPanel" type="PanelContainer" parent="Root"]
+anchor_left = 0.0
+anchor_top = 0.5
+anchor_right = 0.0
+anchor_bottom = 0.5
+offset_left = 32.0
+offset_top = -236.0
+offset_right = 352.0
+offset_bottom = 236.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_window")
+
+[node name="ShipContent" type="VBoxContainer" parent="Root/ShipPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ShipHeader" type="PanelContainer" parent="Root/ShipPanel/ShipContent"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_header")
+
+[node name="ShipHeaderRow" type="HBoxContainer" parent="Root/ShipPanel/ShipContent/ShipHeader"]
+layout_mode = 2
+
+[node name="ShipTitle" type="Label" parent="Root/ShipPanel/ShipContent/ShipHeader/ShipHeaderRow"]
+layout_mode = 2
+text = "Ship Inventory"
+theme_override_colors/font_color = Color(0.85, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 15
+
+[node name="ShipCapBar" type="HBoxContainer" parent="Root/ShipPanel/ShipContent"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ShipCapLabel" type="Label" parent="Root/ShipPanel/ShipContent/ShipCapBar"]
+layout_mode = 2
+text = "0 / 50"
+custom_minimum_size = Vector2(96, 0)
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7, 0.82, 0.95, 1)
+theme_override_font_sizes/font_size = 12
+
+[node name="ShipCapProgress" type="ProgressBar" parent="Root/ShipPanel/ShipContent/ShipCapBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 8)
+max_value = 50.0
+show_percentage = false
+theme_override_styles/background = SubResource("StyleBoxFlat_progress_bg")
+
+[node name="ShipListScroll" type="ScrollContainer" parent="Root/ShipPanel/ShipContent"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 220)
+
+[node name="ShipList" type="VBoxContainer" parent="Root/ShipPanel/ShipContent/ShipListScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="BasePanel" type="PanelContainer" parent="Root"]
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -352.0
+offset_top = -236.0
+offset_right = -32.0
+offset_bottom = 236.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_window")
+
+[node name="BaseContent" type="VBoxContainer" parent="Root/BasePanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BaseHeader" type="PanelContainer" parent="Root/BasePanel/BaseContent"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_header")
+
+[node name="BaseHeaderRow" type="HBoxContainer" parent="Root/BasePanel/BaseContent/BaseHeader"]
+layout_mode = 2
+
+[node name="BaseTitle" type="Label" parent="Root/BasePanel/BaseContent/BaseHeader/BaseHeaderRow"]
+layout_mode = 2
+text = "Base Storage"
+theme_override_colors/font_color = Color(0.85, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 15
+
+[node name="BaseCapBar" type="HBoxContainer" parent="Root/BasePanel/BaseContent"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BaseCapLabel" type="Label" parent="Root/BasePanel/BaseContent/BaseCapBar"]
+layout_mode = 2
+text = "0 / 200"
+custom_minimum_size = Vector2(96, 0)
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.7, 0.82, 0.95, 1)
+theme_override_font_sizes/font_size = 12
+
+[node name="BaseCapProgress" type="ProgressBar" parent="Root/BasePanel/BaseContent/BaseCapBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 8)
+max_value = 200.0
+show_percentage = false
+theme_override_styles/background = SubResource("StyleBoxFlat_progress_bg")
+
+[node name="BaseListScroll" type="ScrollContainer" parent="Root/BasePanel/BaseContent"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 220)
+
+[node name="BaseList" type="VBoxContainer" parent="Root/BasePanel/BaseContent/BaseListScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ActionPanel" type="PanelContainer" parent="Root"]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -90.0
+offset_top = -70.0
+offset_right = 90.0
+offset_bottom = -30.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_action")
+
+[node name="Actions" type="HBoxContainer" parent="Root/ActionPanel"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 10
+
+[node name="CloseBtn" type="Button" parent="Root/ActionPanel/Actions"]
+layout_mode = 2
+text = "Close"
+custom_minimum_size = Vector2(110, 36)
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_secondary")
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
