@@ -206,38 +206,17 @@ func _ensure_destroyed_connection(asteroid: Asteroid) -> void:
 		asteroid.connect("destroyed", callable)
 
 func _get_weight_for_scale(scale_value: float) -> int:
-	if weight_steps <= 1:
-		return 1
-	if weight_max_scale <= weight_min_scale:
-		return 1
-	var ratio := clampf((scale_value - weight_min_scale) / (weight_max_scale - weight_min_scale), 0.0, 1.0)
-	var raw := int(floor(ratio * float(weight_steps))) + 1
-	return clampi(raw, 1, weight_steps)
+	return SpawnWeightCalculator.get_weight_for_scale(scale_value, weight_min_scale, weight_max_scale, weight_steps)
 
 func _pick_spawn_scale(roll: float = -1.0) -> float:
-	var w1 := maxi(spawn_weight_small, 0)
-	var w2 := maxi(spawn_weight_once, 0)
-	var w3 := maxi(spawn_weight_multi, 0)
-	var total := w1 + w2 + w3
-	if total <= 0:
-		return _rng.randf_range(scale_range.x, scale_range.y)
-
-	var r := roll
-	if r < 0.0:
-		r = _rng.randf()
-	r = clampf(r, 0.0, 0.999999) * float(total)
-
-	if r < float(w1):
-		return _rng.randf_range(spawn_scale_tier_small.x, spawn_scale_tier_small.y)
-	r -= float(w1)
-	if r < float(w2):
-		return _rng.randf_range(spawn_scale_tier_once.x, spawn_scale_tier_once.y)
-	return _rng.randf_range(spawn_scale_tier_multi.x, spawn_scale_tier_multi.y)
+	return SpawnWeightCalculator.pick_spawn_scale(
+		_rng, spawn_weight_small, spawn_weight_once, spawn_weight_multi,
+		spawn_scale_tier_small, spawn_scale_tier_once, spawn_scale_tier_multi,
+		scale_range, roll
+	)
 
 func _get_asteroid_weight(asteroid: Asteroid) -> int:
-	if not asteroid:
-		return 0
-	return _get_weight_for_scale(asteroid.scale.x)
+	return SpawnWeightCalculator.get_asteroid_weight(asteroid, weight_min_scale, weight_max_scale, weight_steps)
 
 func _get_area_weight() -> int:
 	if not _player:
