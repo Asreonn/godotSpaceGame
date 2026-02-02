@@ -91,7 +91,7 @@ func _connect_player() -> void:
 		return
 	if _player != player:
 		_player = player
-	var inv := player.get_inventory()
+	var inv: InventoryComponent = player.get_inventory()
 	if inv and inv != _ship_inventory:
 		if _ship_inventory and _ship_inventory.changed.is_connected(_refresh_ui):
 			_ship_inventory.changed.disconnect(_refresh_ui)
@@ -863,7 +863,7 @@ func _create_build_button() -> void:
 
 	# Close butonundan once ekle
 	_action_buttons.add_child(_btn_build)
-	actions.move_child(_btn_build, 0)
+	_action_buttons.move_child(_btn_build, 0)
 
 func _on_build_pressed() -> void:
 	if not _base_station:
