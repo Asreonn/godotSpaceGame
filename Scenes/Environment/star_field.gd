@@ -25,6 +25,15 @@ extends ParallaxBackground
 var _rng := RandomNumberGenerator.new()
 var _rect_size := Vector2.ZERO
 
+@onready var _layer_far: ParallaxLayer = $LayerFar
+@onready var _layer_mid: ParallaxLayer = $LayerMid
+@onready var _layer_near: ParallaxLayer = $LayerNear
+@onready var _layer_stars := {
+	_layer_far: $LayerFar/Stars,
+	_layer_mid: $LayerMid/Stars,
+	_layer_near: $LayerNear/Stars,
+}
+
 func _ready() -> void:
 	if seed != 0:
 		_rng.seed = seed
@@ -58,14 +67,10 @@ func _process(_delta: float) -> void:
 		scroll_offset = -camera.global_position
 
 func _get_layers() -> Array[ParallaxLayer]:
-	var layers: Array[ParallaxLayer] = []
-	for child in get_children():
-		if child is ParallaxLayer:
-			layers.append(child)
-	return layers
+	return [_layer_far, _layer_mid, _layer_near]
 
 func _get_or_create_container(layer: ParallaxLayer) -> Node2D:
-	return layer.get_node("Stars") as Node2D
+	return _layer_stars.get(layer)
 
 func _spawn_stars(
 		container: Node2D,

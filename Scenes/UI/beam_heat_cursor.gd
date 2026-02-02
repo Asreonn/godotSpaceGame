@@ -14,13 +14,15 @@ extends CanvasLayer
 @export var pulse_speed := 8.0
 @export var overheat_pulse_speed := 12.0
 
+@export var laser_beam: LaserBeam
+@export var inventory_ui: InventoryUI
+
 @onready var _root: Control = $Root
 @onready var _ring: Node2D = $Root/Ring
 @onready var _ring_bg: Line2D = $Root/Ring/RingBg
 @onready var _ring_fill: Line2D = $Root/Ring/RingFill
 @onready var _status_label: Label = $Root/StatusLabel
 
-var _laser_beam: Node = null
 var _mouse_hidden := false
 var _pulse_time := 0.0
 
@@ -44,7 +46,6 @@ func _process(delta: float) -> void:
 		return
 
 	_ring.global_position = mouse_pos
-	_update_laser_beam()
 	_update_ring(delta, mouse_pos)
 
 func _update_ring(delta: float, mouse_pos: Vector2) -> void:
@@ -54,10 +55,10 @@ func _update_ring(delta: float, mouse_pos: Vector2) -> void:
 	var overheated: bool = false
 	var cooldown_progress: float = 0.0
 
-	if _laser_beam:
-		heat_ratio = float(_laser_beam.get_heat_ratio())
-		overheated = bool(_laser_beam.is_overheated())
-		cooldown_progress = float(_laser_beam.get_cooldown_progress())
+	if laser_beam:
+		heat_ratio = float(laser_beam.get_heat_ratio())
+		overheated = bool(laser_beam.is_overheated())
+		cooldown_progress = float(laser_beam.get_cooldown_progress())
 
 	var ratio: float = heat_ratio
 	var color: Color = ring_cool_color.lerp(ring_hot_color, clampf(heat_ratio, 0.0, 1.0))
@@ -133,40 +134,10 @@ func _build_arc_points(radius: float, ratio: float, segments: int) -> PackedVect
 		pts.append(Vector2(cos(angle), sin(angle)) * radius)
 	return pts
 
-func _update_laser_beam() -> void:
-	if _laser_beam and is_instance_valid(_laser_beam):
-		return
-	_laser_beam = null
-	var players := get_tree().get_nodes_in_group("player")
-	if players.is_empty():
-		return
-	var player := players[0]
-	if player and player.has_node("LaserBeam"):
-		_laser_beam = player.get_node("LaserBeam")
-
 func _is_mouse_over_ui(mouse_pos: Vector2) -> bool:
-	var inv := _get_inventory_ui()
-	if not inv:
+	if not inventory_ui:
 		return false
-	var ship_panel: Control = inv.get_node_or_null("Root/ShipPanel")
-	if ship_panel and ship_panel.visible and ship_panel.get_global_rect().has_point(mouse_pos):
-		return true
-	var base_panel: Control = inv.get_node_or_null("Root/BasePanel")
-	if base_panel and base_panel.visible and base_panel.get_global_rect().has_point(mouse_pos):
-		return true
-	var action_panel: Control = inv.get_node_or_null("Root/ActionPanel")
-	if action_panel and action_panel.visible and action_panel.get_global_rect().has_point(mouse_pos):
-		return true
-	return false
-
-func _get_inventory_ui() -> Node:
-	var tree := get_tree()
-	if not tree:
-		return null
-	var scene := tree.current_scene
-	if scene and scene.has_node("InventoryUI"):
-		return scene.get_node("InventoryUI")
-	return null
+	return inventory_ui.is_mouse_over_ui(mouse_pos)
 
 func _set_mouse_hidden(hidden: bool) -> void:
 	if hidden == _mouse_hidden:

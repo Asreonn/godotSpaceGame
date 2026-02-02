@@ -11,6 +11,7 @@ signal player_exited(base: BaseStation)
 
 @onready var base_inventory: InventoryComponent = $BaseInventory
 @onready var trigger_area: Area2D = $TriggerArea
+@onready var _trigger_shape: CollisionShape2D = $TriggerArea/CollisionShape2D
 
 var _player_inside: bool = false
 var _player_ref: Node2D = null
@@ -27,8 +28,7 @@ func _ready() -> void:
 	# Collision shape'i kod ile olustur
 	var shape := CircleShape2D.new()
 	shape.radius = trigger_radius
-	var col_shape: CollisionShape2D = trigger_area.get_node("CollisionShape2D")
-	col_shape.shape = shape
+	_trigger_shape.shape = shape
 
 	trigger_area.body_entered.connect(_on_body_entered)
 	trigger_area.body_exited.connect(_on_body_exited)
@@ -53,11 +53,6 @@ func get_build_ui() -> BuildUI:
 # -------------------------------------------------------
 
 func _setup_modular_system() -> void:
-	# Eski Visual node'u kaldir (artik sprite sheet kullaniyoruz)
-	var old_visual := get_node_or_null("Visual")
-	if old_visual:
-		old_visual.queue_free()
-
 	_build_preview.setup(_module_manager)
 	_build_preview.build_completed.connect(_on_build_completed)
 	_build_preview.build_cancelled.connect(_on_build_cancelled)
@@ -144,9 +139,8 @@ func _update_trigger_radius() -> void:
 	var extra := float(module_count - 1) * float(cell_size.x) * 0.6
 	trigger_radius = base_radius + extra
 
-	var col_shape: CollisionShape2D = trigger_area.get_node("CollisionShape2D")
-	if col_shape and col_shape.shape is CircleShape2D:
-		(col_shape.shape as CircleShape2D).radius = trigger_radius
+	if _trigger_shape and _trigger_shape.shape is CircleShape2D:
+		(_trigger_shape.shape as CircleShape2D).radius = trigger_radius
 
 # -------------------------------------------------------
 #  Player giris/cikis

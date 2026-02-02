@@ -1,6 +1,6 @@
 extends Camera2D
 
-@export var target_path: NodePath
+@export var target: Node2D
 @export var follow_speed := 5.0
 @export var shake_decay := 5.0  # Titreşimin azalma hızı
 
@@ -20,7 +20,7 @@ var _target_zoom := 1.0  # Hedef zoom seviyesi
 var _current_zoom := 1.0  # Mevcut zoom seviyesi
 
 func _ready() -> void:
-	_target = get_node_or_null(target_path)
+	_target = target
 	if _target:
 		global_position = _target.global_position
 	Events.camera_shake_requested.connect(_on_camera_shake_requested)
