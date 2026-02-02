@@ -115,14 +115,11 @@ func _on_damage_tick() -> void:
 	if not _current_collider:
 		_damage_tick_timer.stop()
 		return
-	if _current_collider.has_method("take_damage"):
-		_current_collider.take_damage(damage_per_second * damage_tick_seconds)
-		if _current_collider.has_method("impact_pulse"):
-			_current_collider.impact_pulse()
-	if _impact_effect.has_method("pulse"):
-		_impact_effect.pulse()
-	if _visual.has_method("pulse_hit"):
-		_visual.pulse_hit()
+	if _current_collider is Node2D:
+		Events.laser_damage_requested.emit(_current_collider, damage_per_second * damage_tick_seconds)
+		Events.laser_impact_pulse_requested.emit(_current_collider)
+	_impact_effect.pulse()
+	_visual.pulse_hit()
 	_play_impact_sound()
 
 func can_fire() -> bool:
