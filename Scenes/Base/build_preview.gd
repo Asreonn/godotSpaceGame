@@ -155,14 +155,6 @@ func _create_single_indicator(grid_pos: Vector2i) -> Node2D:
 	# Indicator'lar _manager'in child'i olarak ekleniyor (global world coords)
 	node.position = world_pos
 
-	var rect := node.rect
-
-	# Pulsating animasyon (tween'i manager'a bagla, indicator'in parent'i)
-	var tween := _manager.create_tween()
-	tween.set_loops()
-	tween.tween_property(rect, "color:a", 0.3, 0.8).set_trans(Tween.TRANS_SINE)
-	tween.tween_property(rect, "color:a", 0.1, 0.8).set_trans(Tween.TRANS_SINE)
-
 	return node
 
 func _clear_slot_indicators() -> void:
