@@ -169,7 +169,7 @@ func _enter_overheat() -> void:
 	stop_firing()
 
 func _update_heat_visual(delta: float) -> void:
-	if _visual and _visual.has_method("set_heat_level"):
+	if _visual:
 		_visual.set_heat_level(get_heat_ratio(), _is_overheated, delta)
 
 func _play_impact_sound() -> void:

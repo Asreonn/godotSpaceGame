@@ -1,9 +1,10 @@
 extends Area2D
+class_name Asteroid
 
 const EXPLOSION_SCENE := preload("res://Scenes/VFX/asteroid_explosion.tscn")
 const ITEM_DROP_SCENE := preload("res://Scenes/Items/item_drop.tscn")
 
-signal destroyed(asteroid: Area2D)
+signal destroyed(asteroid: Asteroid)
 
 @export var max_health := 100.0
 @export var size_multiplier: float = 0.85
@@ -110,9 +111,7 @@ func _trigger_screen_shake() -> void:
 	shake_intensity = clampf(shake_intensity, 1.5, 8.0)
 	
 	# Kamerayı bul ve shake tetikle
-	var camera := get_viewport().get_camera_2d()
-	if camera and camera.has_method("shake"):
-		camera.shake(shake_intensity)
+	Events.camera_shake_requested.emit(shake_intensity)
 
 func _play_explosion_sound() -> void:
 	# TODO: Ses efekti eklendiğinde buraya entegre edilecek

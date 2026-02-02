@@ -14,8 +14,8 @@ const ASTEROID_SCENE := preload("res://Scenes/Environment/asteroid.tscn")
 @export var scale_range := Vector2(0.4, 1.2)
 @export var player_path: NodePath
 
-var _active_asteroids: Array[Area2D] = []
-var _pool: Array[Area2D] = []
+var _active_asteroids: Array[Asteroid] = []
+var _pool: Array[Asteroid] = []
 var _player: Node2D
 var _rng := RandomNumberGenerator.new()
 var _spawn_timer := 0.0
@@ -55,7 +55,7 @@ func _spawn_asteroid() -> void:
 
 	_active_asteroids.append(asteroid)
 
-func _on_asteroid_destroyed(asteroid: Area2D) -> void:
+func _on_asteroid_destroyed(asteroid: Asteroid) -> void:
 	var idx := _active_asteroids.find(asteroid)
 	if idx >= 0:
 		_active_asteroids.remove_at(idx)
@@ -70,12 +70,7 @@ func _check_despawn() -> void:
 		if asteroid and player_pos.distance_squared_to(asteroid.global_position) > despawn_distance_sq:
 			_active_asteroids.remove_at(i)
 			# Fade out animasyonu başlat
-			if asteroid.has_method("start_fadeout"):
-				asteroid.start_fadeout()
-			else:
-				# Fallback - eski yöntem
-				_deactivate_asteroid(asteroid)
-				_pool.append(asteroid)
+			asteroid.start_fadeout()
 
 func _build_pool(count: int) -> void:
 	for i in count:
@@ -83,38 +78,36 @@ func _build_pool(count: int) -> void:
 		_deactivate_asteroid(asteroid)
 		_pool.append(asteroid)
 
-func _create_asteroid() -> Area2D:
-	var asteroid: Area2D = ASTEROID_SCENE.instantiate()
+func _create_asteroid() -> Asteroid:
+	var asteroid: Asteroid = ASTEROID_SCENE.instantiate()
 	_asteroids_container.add_child(asteroid)
 	_deactivate_asteroid(asteroid)
 	return asteroid
 
-func _place_asteroid_around_player(asteroid: Area2D) -> void:
+func _place_asteroid_around_player(asteroid: Asteroid) -> void:
 	var angle := _rng.randf() * TAU
 	# SABİT mesafeler - her zaman max zoom (5.0x) için optimize
 	var radius := _rng.randf_range(spawn_min_distance, spawn_max_distance)
 	asteroid.global_position = _player.global_position + Vector2.from_angle(angle) * radius
 
-func _randomize_motion(asteroid: Area2D) -> void:
+func _randomize_motion(asteroid: Asteroid) -> void:
 	var velocity := Vector2.from_angle(_rng.randf() * TAU) * _rng.randf_range(speed_range.x, speed_range.y)
 	var rot_speed := _rng.randf_range(rotation_speed_range.x, rotation_speed_range.y)
 	asteroid.configure_motion(velocity, rot_speed)
 
-func _randomize_scale(asteroid: Area2D) -> void:
+func _randomize_scale(asteroid: Asteroid) -> void:
 	# Rastgele boyut ata (1.5 - 8.0 arası)
 	var random_scale := _rng.randf_range(scale_range.x, scale_range.y)
 	asteroid.scale = Vector2.ONE * random_scale
 	
 	# Generation'ı sıfırla (bu yeni spawn edilen orijinal asteroid)
-	if asteroid.has_method("set"):
-		asteroid.generation = 0
+	asteroid.generation = 0
 	
 	# Health'i yeniden hesapla
-	if asteroid.has_method("_apply_health_from_scale"):
-		asteroid._apply_health_from_scale(random_scale)
-		asteroid.current_health = asteroid.max_health
+	asteroid._apply_health_from_scale(random_scale)
+	asteroid.current_health = asteroid.max_health
 
-func _activate_asteroid(asteroid: Area2D) -> void:
+func _activate_asteroid(asteroid: Asteroid) -> void:
 	asteroid.visible = true
 	asteroid.monitoring = true
 	asteroid.monitorable = true
@@ -123,7 +116,7 @@ func _activate_asteroid(asteroid: Area2D) -> void:
 	asteroid.set_process(true)
 	_ensure_destroyed_connection(asteroid)
 
-func _deactivate_asteroid(asteroid: Area2D) -> void:
+func _deactivate_asteroid(asteroid: Asteroid) -> void:
 	asteroid.visible = false
 	asteroid.monitoring = false
 	asteroid.monitorable = false
@@ -131,7 +124,7 @@ func _deactivate_asteroid(asteroid: Area2D) -> void:
 	asteroid.collision_mask = 0
 	asteroid.set_process(false)
 
-func _ensure_destroyed_connection(asteroid: Area2D) -> void:
+func _ensure_destroyed_connection(asteroid: Asteroid) -> void:
 	if not asteroid.has_signal("destroyed"):
 		return
 	var callable := Callable(self, "_on_asteroid_destroyed")

@@ -23,6 +23,7 @@ func _ready() -> void:
 	_target = get_node_or_null(target_path)
 	if _target:
 		global_position = _target.global_position
+	Events.camera_shake_requested.connect(_on_camera_shake_requested)
 	
 	# Başlangıç zoom'u ayarla
 	_target_zoom = zoom_min
@@ -58,6 +59,9 @@ func _physics_process(delta: float) -> void:
 func shake(intensity: float) -> void:
 	# Mevcut shake'den daha güçlüyse değiştir
 	_shake_strength = max(_shake_strength, intensity)
+
+func _on_camera_shake_requested(intensity: float) -> void:
+	shake(intensity)
 
 func _handle_zoom_input(delta: float) -> void:
 	# Zoom In (E tuşu veya mouse wheel up)
