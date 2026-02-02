@@ -1,14 +1,17 @@
 extends Node2D
 
-@export var spawn_interval := 0.8  # ÇOK sık spawn!
-@export var max_asteroids := 120  # Çok fazla asteroid!
-@export var camera_max_zoom := 5.0  # Kameranın max zoom out seviyesi
-@export var spawn_min_distance := 1200.0  # Oyuncuya YAKIN spawn (çok azaltıldı!)
-@export var spawn_max_distance := 2500.0  # Oyuncuya YAKIN spawn (çok azaltıldı!)
-@export var despawn_distance := 4000.0  # Daha yakın despawn
+const ASTEROID_SCENE := preload("res://Scenes/Environment/asteroid.tscn")
+
+@export var spawn_interval := 0.8
+@export var max_asteroids := 120
+@export var initial_pool_size := 15  # Baslangicta olusturulacak pool boyutu
+@export var camera_max_zoom := 5.0
+@export var spawn_min_distance := 1200.0
+@export var spawn_max_distance := 2500.0
+@export var despawn_distance := 4000.0
 @export var speed_range := Vector2(20.0, 60.0)
 @export var rotation_speed_range := Vector2(-0.3, 0.3)
-@export var scale_range := Vector2(0.4, 1.2)  # Rastgele asteroid boyutu (küçültülmüş)
+@export var scale_range := Vector2(0.4, 1.2)
 @export var player_path: NodePath
 
 var _active_asteroids: Array[Area2D] = []
@@ -17,20 +20,24 @@ var _player: Node2D
 var _rng := RandomNumberGenerator.new()
 var _spawn_timer := 0.0
 var _distance_check_timer := 0.0
+var _asteroids_container: Node2D
 
 func _ready() -> void:
 	_rng.randomize()
 	_player = get_node(player_path)
-	_collect_asteroids(self)
-	if _active_asteroids.is_empty():
-		push_warning("AsteroidField: No asteroids found. Add asteroid.tscn instances as children.")
+	_asteroids_container = get_node_or_null("Asteroids")
+	if not _asteroids_container:
+		_asteroids_container = Node2D.new()
+		_asteroids_container.name = "Asteroids"
+		add_child(_asteroids_container)
+	_build_pool(initial_pool_size)
 
 func _process(delta: float) -> void:
 	if not _player:
 		return
 
 	_spawn_timer += delta
-	if _spawn_timer >= spawn_interval and _active_asteroids.size() < max_asteroids and _pool.size() > 0:
+	if _spawn_timer >= spawn_interval and _active_asteroids.size() < max_asteroids:
 		_spawn_asteroid()
 		_spawn_timer = 0.0
 
@@ -40,10 +47,12 @@ func _process(delta: float) -> void:
 		_distance_check_timer = 0.0
 
 func _spawn_asteroid() -> void:
+	var asteroid: Area2D
 	if _pool.is_empty():
-		return
+		asteroid = _create_asteroid()
+	else:
+		asteroid = _pool.pop_back()
 
-	var asteroid = _pool.pop_back()
 	_place_asteroid_around_player(asteroid)
 	_randomize_motion(asteroid)
 	_randomize_scale(asteroid)
@@ -73,15 +82,17 @@ func _check_despawn() -> void:
 				_deactivate_asteroid(asteroid)
 				_pool.append(asteroid)
 
-func _collect_asteroids(root: Node) -> void:
-	for child in root.get_children():
-		if child is Area2D and child.has_method("configure_motion"):
-			_activate_asteroid(child)
-			_place_asteroid_around_player(child)
-			_randomize_motion(child)
-			_randomize_scale(child)
-			_active_asteroids.append(child)
-		_collect_asteroids(child)
+func _build_pool(count: int) -> void:
+	for i in count:
+		var asteroid := _create_asteroid()
+		_deactivate_asteroid(asteroid)
+		_pool.append(asteroid)
+
+func _create_asteroid() -> Area2D:
+	var asteroid: Area2D = ASTEROID_SCENE.instantiate()
+	_asteroids_container.add_child(asteroid)
+	_deactivate_asteroid(asteroid)
+	return asteroid
 
 func _place_asteroid_around_player(asteroid: Area2D) -> void:
 	var angle := _rng.randf() * TAU
@@ -111,12 +122,18 @@ func _randomize_scale(asteroid: Area2D) -> void:
 func _activate_asteroid(asteroid: Area2D) -> void:
 	asteroid.visible = true
 	asteroid.monitoring = true
+	asteroid.monitorable = true
+	asteroid.collision_layer = 2
+	asteroid.collision_mask = 0
 	asteroid.set_process(true)
 	_ensure_destroyed_connection(asteroid)
 
 func _deactivate_asteroid(asteroid: Area2D) -> void:
 	asteroid.visible = false
 	asteroid.monitoring = false
+	asteroid.monitorable = false
+	asteroid.collision_layer = 0
+	asteroid.collision_mask = 0
 	asteroid.set_process(false)
 
 func _ensure_destroyed_connection(asteroid: Area2D) -> void:

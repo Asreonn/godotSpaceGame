@@ -9,7 +9,7 @@ var _time := 0.0
 var retiring := false
 
 const CYCLE_DURATION := 2.5
-const MIN_SCALE_FACTOR := 0.05
+const MIN_SCALE_FACTOR := 0.0
 const MAX_SCALE_FACTOR := 0.7
 const GLOW_STRENGTH := 1.6
 
@@ -22,7 +22,7 @@ func setup(
 		rotation_speed_value: float
 	) -> void:
 	texture = tex
-	base_scale = base_scale_value * 0.5
+	base_scale = base_scale_value
 	twinkle_speed = twinkle_speed_value
 	rotation_speed = rotation_speed_value
 	_time = 0.0

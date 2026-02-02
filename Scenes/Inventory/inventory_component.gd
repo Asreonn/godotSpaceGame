@@ -136,7 +136,7 @@ func transfer_to(target: InventoryComponent, item_id: String, amount: int) -> in
 ## Tum itemleri hedefe transfer eder. Aktarilan miktarlari dondurur.
 func transfer_all_to(target: InventoryComponent) -> Dictionary:
 	var transferred: Dictionary = {}
-	var keys := _items.keys().duplicate()
+	var keys: Array = _items.keys().duplicate()
 	for item_id in keys:
 		var count: int = _items.get(item_id, 0)
 		if count > 0:

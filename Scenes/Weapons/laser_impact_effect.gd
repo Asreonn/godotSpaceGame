@@ -18,28 +18,27 @@ func _ready() -> void:
 func _setup_hit_material() -> void:
 	_hit_material = ParticleProcessMaterial.new()
 	_hit_material.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
-	_hit_material.emission_sphere_radius = 3.5
+	_hit_material.emission_sphere_radius = 5.0
 	_hit_material.direction = Vector3(0, 1, 0)
-	_hit_material.spread = 22.0
-	# Daha yavaş, yumuşak parçacıklar
-	_hit_material.initial_velocity_min = 35.0
-	_hit_material.initial_velocity_max = 100.0
+	_hit_material.spread = 35.0
+	_hit_material.initial_velocity_min = 50.0
+	_hit_material.initial_velocity_max = 140.0
 	_hit_material.gravity = Vector3.ZERO
-	_hit_material.damping_min = 60.0
-	_hit_material.damping_max = 110.0
-	# Daha küçük boyut
-	_hit_material.scale_min = 0.6
-	_hit_material.scale_max = 1.8
-	_hit_material.color = Color(0.8, 0.6, 0.95, 0.9)
+	_hit_material.damping_min = 50.0
+	_hit_material.damping_max = 100.0
+	# Belirgin boyut
+	_hit_material.scale_min = 0.8
+	_hit_material.scale_max = 2.2
+	_hit_material.color = Color(0.9, 0.7, 1.0, 0.95)
 
-	# Yumuşak 5 noktalı gradient
+	# Parlak, belirgin gradient
 	var color_ramp := Gradient.new()
-	color_ramp.offsets = PackedFloat32Array([0.0, 0.2, 0.5, 0.8, 1.0])
+	color_ramp.offsets = PackedFloat32Array([0.0, 0.15, 0.4, 0.7, 1.0])
 	color_ramp.colors = PackedColorArray([
-		Color(0.9, 0.75, 1.0, 0.9),
-		Color(0.8, 0.6, 0.95, 0.7),
-		Color(0.65, 0.45, 0.85, 0.4),
-		Color(0.45, 0.28, 0.7, 0.15),
+		Color(1.0, 0.9, 1.0, 1.0),
+		Color(0.9, 0.7, 1.0, 0.85),
+		Color(0.75, 0.55, 0.9, 0.5),
+		Color(0.5, 0.3, 0.75, 0.2),
 		Color(0.3, 0.15, 0.5, 0.0)
 	])
 	var color_tex := GradientTexture1D.new()
@@ -49,9 +48,9 @@ func _setup_hit_material() -> void:
 	# Scale curve - smooth fade
 	var scale_curve := Curve.new()
 	scale_curve.clear_points()
-	scale_curve.add_point(Vector2(0.0, 0.2), 0.0, 4.0)
-	scale_curve.add_point(Vector2(0.15, 1.0), 0.0, 0.0)
-	scale_curve.add_point(Vector2(0.5, 0.7), -0.4, -0.4)
+	scale_curve.add_point(Vector2(0.0, 0.3), 0.0, 4.0)
+	scale_curve.add_point(Vector2(0.12, 1.0), 0.0, 0.0)
+	scale_curve.add_point(Vector2(0.45, 0.75), -0.4, -0.4)
 	scale_curve.add_point(Vector2(1.0, 0.0), -1.0, 0.0)
 	var scale_tex := CurveTexture.new()
 	scale_tex.curve = scale_curve
@@ -87,8 +86,8 @@ func _setup_miss_material() -> void:
 
 func set_hit_mode(hitting: bool) -> void:
 	if hitting:
-		amount = 40
-		lifetime = 0.35
+		amount = 55
+		lifetime = 0.4
 		process_material = _hit_material
 	else:
 		amount = 20
@@ -120,17 +119,16 @@ func _trigger_shockwave() -> void:
 	if _shockwave_tween and _shockwave_tween.is_running():
 		_shockwave_tween.kill()
 
-	# Daha küçük başlangıç, daha az agresif
-	_shockwave_sprite.scale = Vector2(0.15, 0.15)
-	_shockwave_sprite.modulate = Color(0.8, 0.65, 0.95, 0.55)
+	_shockwave_sprite.scale = Vector2(0.2, 0.2)
+	_shockwave_sprite.modulate = Color(0.9, 0.75, 1.0, 0.7)
 
 	_shockwave_tween = create_tween()
 	_shockwave_tween.set_parallel(true)
 
-	# Daha küçük genişleme, daha yavaş
-	_shockwave_tween.tween_property(_shockwave_sprite, "scale", Vector2(1.5, 1.5), 0.3) \
+	# Belirgin genisleme
+	_shockwave_tween.tween_property(_shockwave_sprite, "scale", Vector2(2.2, 2.2), 0.25) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
-	# Daha yumuşak fade out
-	_shockwave_tween.tween_property(_shockwave_sprite, "modulate:a", 0.0, 0.35) \
+	# Fade out
+	_shockwave_tween.tween_property(_shockwave_sprite, "modulate:a", 0.0, 0.3) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)

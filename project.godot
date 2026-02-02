@@ -15,6 +15,18 @@ run/main_scene="uid://bonm5vusaahfb"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+ItemDB="*res://Scenes/Inventory/item_database.gd"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/mode=2
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
 [input]
 
 ui_left={
@@ -78,6 +90,9 @@ zoom_out={
 
 [rendering]
 
+anti_aliasing/quality/msaa_2d=3
+anti_aliasing/quality/screen_space_aa=1
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.18, 0.12, 0.26, 1)

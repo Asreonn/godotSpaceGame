@@ -48,13 +48,16 @@ var _split_bar_label: Label = null  # miktar yazisi
 @onready var _ship_panel: PanelContainer = $Root/ShipPanel
 @onready var _base_panel: PanelContainer = $Root/BasePanel
 @onready var _action_panel: PanelContainer = $Root/ActionPanel
-@onready var _ship_list: VBoxContainer = $Root/ShipPanel/ShipContent/ShipListScroll/ShipList
-@onready var _ship_cap_label: Label = $Root/ShipPanel/ShipContent/ShipCapBar/ShipCapLabel
-@onready var _ship_cap_bar: ProgressBar = $Root/ShipPanel/ShipContent/ShipCapBar/ShipCapProgress
-@onready var _base_list: VBoxContainer = $Root/BasePanel/BaseContent/BaseListScroll/BaseList
-@onready var _base_cap_label: Label = $Root/BasePanel/BaseContent/BaseCapBar/BaseCapLabel
-@onready var _base_cap_bar: ProgressBar = $Root/BasePanel/BaseContent/BaseCapBar/BaseCapProgress
+@onready var _ship_list: VBoxContainer = $Root/ShipPanel/Content/ListScroll/List
+@onready var _ship_cap_label: Label = $Root/ShipPanel/Content/Header/HeaderRow/CapLabel
+@onready var _ship_cap_bar: ProgressBar = $Root/ShipPanel/Content/CapBar/CapProgress
+@onready var _base_list: VBoxContainer = $Root/BasePanel/Content/ListScroll/List
+@onready var _base_cap_label: Label = $Root/BasePanel/Content/Header/HeaderRow/CapLabel
+@onready var _base_cap_bar: ProgressBar = $Root/BasePanel/Content/CapBar/CapProgress
 @onready var _btn_close: Button = $Root/ActionPanel/Actions/CloseBtn
+
+## Build mode butonu (dinamik olusturulur)
+var _btn_build: Button = null
 
 func _ready() -> void:
 	layer = 101
@@ -73,6 +76,7 @@ func _ready() -> void:
 	get_tree().node_added.connect(_on_node_added)
 	_create_carry_preview()
 	_create_split_bar()
+	_create_build_button()
 
 func _on_node_added(node: Node) -> void:
 	if node is BaseStation:
@@ -140,6 +144,8 @@ func _open_with_base(player: Node2D, base: Node2D) -> void:
 	_base_panel.visible = (_base_inventory != null)
 	_action_panel.visible = (_base_inventory != null)
 	_btn_close.visible = (_base_inventory != null)
+	if _btn_build:
+		_btn_build.visible = (_base_inventory != null)
 
 	_is_open = true
 	_show_ui()
@@ -152,8 +158,15 @@ func close_ui() -> void:
 	_base_panel.visible = false
 	_action_panel.visible = false
 	_btn_close.visible = false
+	if _btn_build:
+		_btn_build.visible = false
 	if _base_inventory and _base_inventory.changed.is_connected(_refresh_ui):
 		_base_inventory.changed.disconnect(_refresh_ui)
+
+	# Build UI'yi de kapat
+	if _base_station and _base_station.has_method("hide_build_ui"):
+		_base_station.hide_build_ui()
+
 	_base_inventory = null
 	_base_station = null
 	_selected_item_id = ""
@@ -806,3 +819,59 @@ func _get_player() -> Node2D:
 	if players.is_empty():
 		return null
 	return players[0] as Node2D
+
+# ============================================================
+#  Build Mode
+# ============================================================
+
+func _create_build_button() -> void:
+	# ActionPanel'in Actions HBox'ina Build butonu ekle
+	var actions := _action_panel.get_node_or_null("Actions")
+	if not actions:
+		return
+
+	_btn_build = Button.new()
+	_btn_build.text = "Build"
+	_btn_build.custom_minimum_size = Vector2(110, 36)
+	_btn_build.visible = false
+
+	var style := StyleBoxFlat.new()
+	style.content_margin_left = 14.0
+	style.content_margin_top = 6.0
+	style.content_margin_right = 14.0
+	style.content_margin_bottom = 6.0
+	style.bg_color = Color(0.0, 0.45, 0.55, 0.95)
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	style.border_color = Color(0.0, 0.75, 0.85, 1.0)
+	style.corner_radius_top_left = 8
+	style.corner_radius_top_right = 8
+	style.corner_radius_bottom_right = 8
+	style.corner_radius_bottom_left = 8
+	_btn_build.add_theme_stylebox_override("normal", style)
+
+	var hover_style := style.duplicate()
+	hover_style.bg_color = Color(0.0, 0.55, 0.65, 0.95)
+	_btn_build.add_theme_stylebox_override("hover", hover_style)
+
+	var pressed_style := style.duplicate()
+	pressed_style.bg_color = Color(0.0, 0.35, 0.45, 0.95)
+	_btn_build.add_theme_stylebox_override("pressed", pressed_style)
+
+	_btn_build.add_theme_color_override("font_color", Color(0.0, 0.95, 1.0))
+	_btn_build.add_theme_font_size_override("font_size", 13)
+
+	_btn_build.pressed.connect(_on_build_pressed)
+
+	# Close butonundan once ekle
+	actions.add_child(_btn_build)
+	actions.move_child(_btn_build, 0)
+
+func _on_build_pressed() -> void:
+	if not _base_station:
+		return
+	# BaseStation'daki build UI'yi ac
+	if _base_station.has_method("show_build_ui"):
+		_base_station.show_build_ui()

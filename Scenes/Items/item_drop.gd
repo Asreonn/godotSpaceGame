@@ -31,6 +31,12 @@ var _no_scatter: bool = false  ## true ise spawn scatter hareketi yapilmaz
 var _launching: bool = false
 var _launch_target: Vector2 = Vector2.ZERO
 var _launch_arrived: bool = false
+var _launch_max_speed: float = 0.0
+
+@export var launch_lerp_strength: float = 12.0
+@export var launch_min_speed: float = 40.0
+@export var launch_decel_distance: float = 60.0
+@export var launch_stop_distance: float = 8.0
 
 @onready var _sprite: Sprite2D = $Sprite2D
 
@@ -52,6 +58,7 @@ func _ready() -> void:
 		_launching = true
 		_velocity = get_meta("launch_velocity") as Vector2
 		_launch_target = get_meta("launch_target") as Vector2
+		_launch_max_speed = maxf(_velocity.length(), launch_min_speed)
 		_spawn_delay = 0.0  # firlatmada gecikme yok, hemen hareket
 	elif not _no_scatter:
 		var angle := randf() * TAU
@@ -124,7 +131,7 @@ func _process_launch(delta: float) -> void:
 	var to_target := _launch_target - global_position
 	var dist := to_target.length()
 
-	if dist < 8.0:
+	if dist < launch_stop_distance:
 		# Hedefe vardi
 		global_position = _launch_target
 		_velocity = Vector2.ZERO
@@ -134,14 +141,26 @@ func _process_launch(delta: float) -> void:
 		_spawn_timer = 999.0  # gecikmeyi atla, hemen toplanabilir
 		return
 
-	# Hedefe yaklastikca yavasla (easing)
-	var speed := _velocity.length()
-	var decel_dist := 60.0
-	if dist < decel_dist:
-		var slow_factor := dist / decel_dist
-		_velocity = _velocity.normalized() * maxf(speed * slow_factor, 40.0)
+	var desired_speed := _launch_max_speed
+	if dist < launch_decel_distance:
+		var slow_factor := dist / launch_decel_distance
+		desired_speed = maxf(_launch_max_speed * slow_factor, launch_min_speed)
 
-	position += _velocity * delta
+	var desired_velocity := to_target.normalized() * desired_speed
+	var lerp_t := 1.0 - exp(-launch_lerp_strength * delta)
+	_velocity = _velocity.lerp(desired_velocity, lerp_t)
+
+	var step := _velocity * delta
+	if step.length() >= dist:
+		global_position = _launch_target
+		_velocity = Vector2.ZERO
+		_launching = false
+		_launch_arrived = true
+		_spawn_delay = 0.0
+		_spawn_timer = 999.0
+		return
+
+	position += step
 
 func _find_target() -> void:
 	var players := get_tree().get_nodes_in_group("player")

@@ -1,9 +1,10 @@
-[gd_scene format=3 uid="uid://dstarscene0001"]
+[gd_scene format=3 uid="uid://0msikvtvqvjc"]
 
-[ext_resource type="Script" uid="uid://llfy1yx2twtu" path="res://Scripts/Environment/star_twinkle.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://Assets/Environment/Star.png" id="2_texture"]
+[ext_resource type="Script" uid="uid://llfy1yx2twtu" path="res://Scenes/Environment/star_twinkle.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://b2t7b2h85kdor" path="res://Assets/Environment/Star.png" id="2_texture"]
 
-[node name="Star" type="Sprite2D"]
+[node name="Star" type="Sprite2D" unique_id=2005225035]
+texture_filter = 2
+scale = Vector2(2, 2)
 texture = ExtResource("2_texture")
-centered = true
 script = ExtResource("1_script")
