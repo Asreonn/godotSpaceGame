@@ -16,9 +16,9 @@ var _player_inside: bool = false
 var _player_ref: Node2D = null
 
 ## Moduler base sistemi
-var _module_manager: ModularBaseManager = null
-var _build_preview: BuildPreview = null
-var _build_ui: BuildUI = null
+@onready var _module_manager: ModularBaseManager = $ModuleManager
+@onready var _build_preview: BuildPreview = $BuildPreview
+@onready var _build_ui: BuildUI = $BuildUI
 var _build_mode_active: bool = false
 
 func _ready() -> void:
@@ -58,26 +58,13 @@ func _setup_modular_system() -> void:
 	if old_visual:
 		old_visual.queue_free()
 
-	# ModularBaseManager olustur
-	_module_manager = ModularBaseManager.new()
-	_module_manager.name = "ModuleManager"
-	add_child(_module_manager)
-
-	# BuildPreview olustur
-	_build_preview = BuildPreview.new()
-	_build_preview.name = "BuildPreview"
 	_build_preview.setup(_module_manager)
 	_build_preview.build_completed.connect(_on_build_completed)
 	_build_preview.build_cancelled.connect(_on_build_cancelled)
-	add_child(_build_preview)
 
-	# BuildUI olustur
-	_build_ui = BuildUI.new()
-	_build_ui.name = "BuildUI"
 	_build_ui.setup(_module_manager, base_inventory)
 	_build_ui.build_mode_requested.connect(_on_build_mode_requested)
 	_build_ui.build_mode_closed.connect(_on_build_mode_closed)
-	add_child(_build_ui)
 
 	# Envanter degistiginde build UI'yi guncelle
 	if base_inventory:

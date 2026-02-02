@@ -4,6 +4,8 @@
 [ext_resource type="Script" uid="uid://crntbae1m1yon" path="res://Scenes/Weapons/laser_beam_visual.gd" id="2_visual"]
 [ext_resource type="Script" uid="uid://crntaviw137oo" path="res://Scenes/Weapons/laser_impact_effect.gd" id="3_impact"]
 [ext_resource type="Texture2D" path="res://Assets/Weapons/glowing_circle.png" id="4_glow"]
+[ext_resource type="PackedScene" path="res://Scenes/Weapons/damage_tick_timer.tscn" id="5_damage_timer"]
+[ext_resource type="PackedScene" path="res://Scenes/Weapons/shockwave_sprite.tscn" id="6_shockwave_sprite"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_34mpn"]
 particle_flag_disable_z = true
@@ -127,3 +129,7 @@ top_level = true
 emitting = false
 process_material = SubResource("ParticleProcessMaterial_5x03j")
 script = ExtResource("3_impact")
+
+[node name="DamageTickTimer" parent="." instance=ExtResource("5_damage_timer")]
+
+[node name="ShockwaveSprite" parent="ImpactEffect" instance=ExtResource("6_shockwave_sprite")]

@@ -16,7 +16,7 @@ var module_def: ModuleDefinition = null
 var active_connections: Array[Vector2i] = []
 
 ## Sprite node referansi
-var _sprite: Sprite2D = null
+@onready var _sprite: Sprite2D = $Sprite
 
 # -------------------------------------------------------
 #  Baslatma
@@ -28,16 +28,14 @@ func setup(pos: Vector2i, definition: ModuleDefinition) -> void:
 	name = "Module_%s_%s" % [pos.x, pos.y]
 
 func _ready() -> void:
-	_create_sprite()
+	_configure_sprite()
 	_update_sprite()
 
 # -------------------------------------------------------
 #  Sprite yonetimi
 # -------------------------------------------------------
 
-func _create_sprite() -> void:
-	_sprite = Sprite2D.new()
-	_sprite.name = "Sprite"
+func _configure_sprite() -> void:
 	_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_sprite.texture_repeat = CanvasItem.TEXTURE_REPEAT_DISABLED
 	if module_def and module_def.sprite_sheet:
@@ -45,7 +43,6 @@ func _create_sprite() -> void:
 		_sprite.hframes = module_def.h_frames
 		_sprite.vframes = 1
 		_sprite.frame = 0
-	add_child(_sprite)
 
 func _update_sprite() -> void:
 	if not _sprite or not module_def:
