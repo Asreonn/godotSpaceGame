@@ -20,16 +20,11 @@ var _player: Node2D
 var _rng := RandomNumberGenerator.new()
 var _spawn_timer := 0.0
 var _distance_check_timer := 0.0
-var _asteroids_container: Node2D
+@onready var _asteroids_container: Node2D = $Asteroids
 
 func _ready() -> void:
 	_rng.randomize()
 	_player = get_node(player_path)
-	_asteroids_container = get_node_or_null("Asteroids")
-	if not _asteroids_container:
-		_asteroids_container = Node2D.new()
-		_asteroids_container.name = "Asteroids"
-		add_child(_asteroids_container)
 	_build_pool(initial_pool_size)
 
 func _process(delta: float) -> void:

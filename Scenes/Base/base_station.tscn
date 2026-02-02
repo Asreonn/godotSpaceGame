@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://Scenes/Base/base_station.gd" id="1_base"]
 [ext_resource type="Script" path="res://Scenes/Inventory/inventory_component.gd" id="2_inventory"]
+[ext_resource type="Script" path="res://Scenes/Base/modular_base_manager.gd" id="3_module_manager"]
+[ext_resource type="Script" path="res://Scenes/Base/build_preview.gd" id="4_build_preview"]
+[ext_resource type="Script" path="res://Scenes/Base/build_ui.gd" id="5_build_ui"]
 
 [node name="BaseStation" type="Node2D"]
 script = ExtResource("1_base")
@@ -18,3 +21,28 @@ monitoring = true
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TriggerArea"]
+
+[node name="ModuleManager" type="Node2D" parent="."]
+script = ExtResource("3_module_manager")
+
+[node name="BuildPreview" type="Node2D" parent="."]
+script = ExtResource("4_build_preview")
+
+[node name="PreviewSprite" type="Sprite2D" parent="BuildPreview"]
+
+[node name="ProgressBarBG" type="ColorRect" parent="BuildPreview"]
+size = Vector2(120, 8)
+position = Vector2(-60, -280)
+color = Color(0.1, 0.1, 0.15, 0.8)
+visible = false
+z_index = 10
+
+[node name="ProgressBarFill" type="ColorRect" parent="BuildPreview"]
+size = Vector2(0, 8)
+position = Vector2(-60, -280)
+color = Color(0.0, 0.85, 0.9, 0.9)
+visible = false
+z_index = 11
+
+[node name="BuildUI" type="CanvasLayer" parent="."]
+script = ExtResource("5_build_ui")

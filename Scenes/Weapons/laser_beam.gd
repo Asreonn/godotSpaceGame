@@ -12,7 +12,7 @@ var _firing := false
 var _raycast: RayCast2D
 var _visual: Node2D
 var _impact_effect: GPUParticles2D
-var _damage_tick_timer: Timer
+@onready var _damage_tick_timer: Timer = $DamageTickTimer
 var _current_collider: Object = null
 var _last_collider: Object = null
 var _is_hitting := false
@@ -36,12 +36,10 @@ func _ready() -> void:
 	_impact_effect.emitting = false
 
 func _setup_damage_timer() -> void:
-	_damage_tick_timer = Timer.new()
 	_damage_tick_timer.wait_time = damage_tick_seconds
 	_damage_tick_timer.one_shot = false
 	_damage_tick_timer.autostart = false
 	_damage_tick_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS
-	add_child(_damage_tick_timer)
 	_damage_tick_timer.timeout.connect(_on_damage_tick)
 
 func _physics_process(delta: float) -> void:

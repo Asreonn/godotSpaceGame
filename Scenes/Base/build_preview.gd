@@ -18,7 +18,7 @@ var _manager: ModularBaseManager = null
 var _module_def: ModuleDefinition = null
 
 ## Preview sprite (hologram shader'li)
-var _preview_sprite: Sprite2D = null
+@onready var _preview_sprite: Sprite2D = $PreviewSprite
 
 ## Shader material
 var _shader_material: ShaderMaterial = null
@@ -45,8 +45,10 @@ var _buildable_positions: Array[Vector2i] = []
 var _slot_indicators: Array[Node2D] = []
 
 ## Progress bar UI
-var _progress_bar_bg: ColorRect = null
-var _progress_bar_fill: ColorRect = null
+@onready var _progress_bar_bg: ColorRect = $ProgressBarBG
+@onready var _progress_bar_fill: ColorRect = $ProgressBarFill
+
+const SLOT_INDICATOR_SCENE := preload("res://Scenes/Base/build_slot_indicator.tscn")
 
 ## Aktif mi?
 var _active: bool = false
@@ -65,8 +67,8 @@ func activate(module_def: ModuleDefinition) -> void:
 	_is_building = false
 	_mouse_held = false
 
-	_create_preview_sprite()
-	_create_progress_bar()
+	_configure_preview_sprite()
+	_reset_progress_bar()
 	_refresh_buildable_positions()
 	_create_slot_indicators()
 
@@ -104,12 +106,7 @@ func _exit_tree() -> void:
 #  Preview sprite olusturma
 # -------------------------------------------------------
 
-func _create_preview_sprite() -> void:
-	if _preview_sprite:
-		_preview_sprite.queue_free()
-
-	_preview_sprite = Sprite2D.new()
-	_preview_sprite.name = "PreviewSprite"
+func _configure_preview_sprite() -> void:
 	_preview_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_preview_sprite.texture_repeat = CanvasItem.TEXTURE_REPEAT_DISABLED
 
@@ -126,32 +123,12 @@ func _create_preview_sprite() -> void:
 	_shader_material.set_shader_parameter("is_valid", true)
 	_shader_material.set_shader_parameter("progress", 0.0)
 	_preview_sprite.material = _shader_material
+	_preview_sprite.visible = true
 
-	add_child(_preview_sprite)
-
-func _create_progress_bar() -> void:
-	if _progress_bar_bg:
-		_progress_bar_bg.queue_free()
-	if _progress_bar_fill:
-		_progress_bar_fill.queue_free()
-
-	# Arkaplan
-	_progress_bar_bg = ColorRect.new()
-	_progress_bar_bg.size = Vector2(120, 8)
-	_progress_bar_bg.position = Vector2(-60, -280)
-	_progress_bar_bg.color = Color(0.1, 0.1, 0.15, 0.8)
+func _reset_progress_bar() -> void:
 	_progress_bar_bg.visible = false
-	_progress_bar_bg.z_index = 10
-	add_child(_progress_bar_bg)
-
-	# Dolum
-	_progress_bar_fill = ColorRect.new()
-	_progress_bar_fill.size = Vector2(0, 8)
-	_progress_bar_fill.position = Vector2(-60, -280)
-	_progress_bar_fill.color = Color(0.0, 0.85, 0.9, 0.9)
 	_progress_bar_fill.visible = false
-	_progress_bar_fill.z_index = 11
-	add_child(_progress_bar_fill)
+	_progress_bar_fill.size = Vector2(0, _progress_bar_fill.size.y)
 
 # -------------------------------------------------------
 #  Slot gostericileri (buildable pozisyonlari gosterme)
@@ -173,26 +150,12 @@ func _create_slot_indicators() -> void:
 		_manager.add_child(indicator)
 
 func _create_single_indicator(grid_pos: Vector2i) -> Node2D:
-	var node := Node2D.new()
+	var node := SLOT_INDICATOR_SCENE.instantiate() as Node2D
 	var world_pos := _manager.grid_to_world(grid_pos)
 	# Indicator'lar _manager'in child'i olarak ekleniyor (global world coords)
 	node.position = world_pos
 
-	# Kucuk daire veya kare ciz
-	var rect := ColorRect.new()
-	rect.size = Vector2(60, 60)
-	rect.position = Vector2(-30, -30)
-	rect.color = Color(0.0, 0.85, 0.9, 0.15)
-	node.add_child(rect)
-
-	# + isareti ekle
-	var plus := Label.new()
-	plus.text = "+"
-	plus.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	plus.add_theme_color_override("font_color", Color(0.0, 0.85, 0.9, 0.4))
-	plus.add_theme_font_size_override("font_size", 28)
-	plus.position = Vector2(-10, -20)
-	node.add_child(plus)
+	var rect := node.get_node("Rect") as ColorRect
 
 	# Pulsating animasyon (tween'i manager'a bagla, indicator'in parent'i)
 	var tween := _manager.create_tween()
