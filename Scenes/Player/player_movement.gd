@@ -16,6 +16,8 @@ var _beam_enabled := true
 
 func _ready() -> void:
 	add_to_group("player")
+	Events.player_entered_base_station.connect(_on_player_entered_base_station)
+	Events.player_exited_base_station.connect(_on_player_exited_base_station)
 
 func get_inventory() -> InventoryComponent:
 	return ship_inventory
@@ -33,6 +35,18 @@ func is_beam_enabled() -> bool:
 
 func get_nearby_base() -> Node2D:
 	return _nearby_base
+
+func _on_player_entered_base_station(base: Node2D, player: Node2D) -> void:
+	if player != self:
+		return
+	set_nearby_base(base)
+	set_beam_enabled(false)
+
+func _on_player_exited_base_station(_base: Node2D, player: Node2D) -> void:
+	if player != self:
+		return
+	set_nearby_base(null)
+	set_beam_enabled(true)
 
 func _physics_process(delta: float) -> void:
 	var horizontal := Input.get_axis("ui_left", "ui_right")
