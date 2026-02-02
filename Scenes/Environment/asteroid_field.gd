@@ -3,7 +3,7 @@ extends Node2D
 const ASTEROID_SCENE := preload("res://Scenes/Environment/asteroid.tscn")
 
 @export var spawn_interval := 0.8
-@export var max_asteroids := 120
+@export var max_asteroids := 60
 @export var initial_pool_size := 15  # Baslangicta olusturulacak pool boyutu
 @export var camera_min_zoom := 1.0
 @export var camera_max_zoom := 5.0
@@ -18,10 +18,16 @@ const ASTEROID_SCENE := preload("res://Scenes/Environment/asteroid.tscn")
 @export var drift_strength := 0.35
 @export var approach_offset_ratio_range := Vector2(0.35, 0.75)
 @export var flyby_angle_deg_range := Vector2(20.0, 50.0)
-@export var max_area_capacity := 50
+@export var max_area_capacity := 25
 @export var weight_min_scale := 0.2125
 @export var weight_max_scale := 1.2
 @export var weight_steps := 5
+@export var spawn_scale_tier_small := Vector2(0.25, 0.34)
+@export var spawn_scale_tier_once := Vector2(0.35, 0.49)
+@export var spawn_scale_tier_multi := Vector2(0.5, 1.2)
+@export var spawn_weight_small := 1
+@export var spawn_weight_once := 2
+@export var spawn_weight_multi := 6
 @export var rotation_speed_range := Vector2(-0.3, 0.3)
 @export var scale_range := Vector2(0.4, 1.2)
 @export var player_path: NodePath
@@ -64,7 +70,7 @@ func _spawn_asteroid(current_area_weight: int = -1) -> void:
 	if current_area_weight >= max_area_capacity:
 		return
 
-	var random_scale := _rng.randf_range(scale_range.x, scale_range.y)
+	var random_scale := _pick_spawn_scale()
 	var new_weight := _get_weight_for_scale(random_scale)
 	if current_area_weight + new_weight > max_area_capacity:
 		return
@@ -207,6 +213,26 @@ func _get_weight_for_scale(scale_value: float) -> int:
 	var ratio := clampf((scale_value - weight_min_scale) / (weight_max_scale - weight_min_scale), 0.0, 1.0)
 	var raw := int(floor(ratio * float(weight_steps))) + 1
 	return clampi(raw, 1, weight_steps)
+
+func _pick_spawn_scale(roll: float = -1.0) -> float:
+	var w1 := maxi(spawn_weight_small, 0)
+	var w2 := maxi(spawn_weight_once, 0)
+	var w3 := maxi(spawn_weight_multi, 0)
+	var total := w1 + w2 + w3
+	if total <= 0:
+		return _rng.randf_range(scale_range.x, scale_range.y)
+
+	var r := roll
+	if r < 0.0:
+		r = _rng.randf()
+	r = clampf(r, 0.0, 0.999999) * float(total)
+
+	if r < float(w1):
+		return _rng.randf_range(spawn_scale_tier_small.x, spawn_scale_tier_small.y)
+	r -= float(w1)
+	if r < float(w2):
+		return _rng.randf_range(spawn_scale_tier_once.x, spawn_scale_tier_once.y)
+	return _rng.randf_range(spawn_scale_tier_multi.x, spawn_scale_tier_multi.y)
 
 func _get_asteroid_weight(asteroid: Asteroid) -> int:
 	if not asteroid:

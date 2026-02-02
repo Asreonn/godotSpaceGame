@@ -94,10 +94,18 @@ func _failures_for_asteroid_spawn(failures: Array[String]) -> void:
 	var slow_view_radius: float = view_size.length() * 0.5 * slow_zoom
 	if field._slow_zone_radius < slow_view_radius:
 		failures.append("asteroid_field: slow zone radius below slow zoom view")
-	if field.max_area_capacity != 50:
-		failures.append("asteroid_field: max area capacity expected 50")
+	if field.max_area_capacity != 25:
+		failures.append("asteroid_field: max area capacity expected 25")
+	if field.max_asteroids != 60:
+		failures.append("asteroid_field: max asteroids expected 60")
 	if field.weight_steps != 5:
 		failures.append("asteroid_field: weight steps expected 5")
+	if field.spawn_weight_small != 1:
+		failures.append("asteroid_field: spawn_weight_small expected 1")
+	if field.spawn_weight_once != 2:
+		failures.append("asteroid_field: spawn_weight_once expected 2")
+	if field.spawn_weight_multi != 6:
+		failures.append("asteroid_field: spawn_weight_multi expected 6")
 
 	var player := game.get_node_or_null("Player") as Node2D
 	if not player:
@@ -140,8 +148,10 @@ func _failures_for_asteroid_spawn(failures: Array[String]) -> void:
 		failures.append("asteroid_field: area weight expected %s got %s" % [expected_weight, total_weight])
 	for ast in field._active_asteroids:
 		if ast:
+			field._deactivate_asteroid(ast)
 			ast.queue_free()
 	field._active_asteroids.clear()
+	await get_tree().process_frame
 
 	field._spawn_asteroid()
 	await get_tree().process_frame
@@ -163,6 +173,67 @@ func _failures_for_asteroid_spawn(failures: Array[String]) -> void:
 	var vel_dir := asteroid.velocity.normalized()
 	if vel_dir.length() > 0.001 and dir_to_player.dot(vel_dir) > 0.98:
 		failures.append("asteroid_field: fly-by too direct")
+
+	var offset := Vector2(240, 0)
+	var stuck: Asteroid = field._create_asteroid()
+	stuck.configure_motion(Vector2.ZERO, 0.0)
+	stuck._scale_initialized = true
+	stuck.scale = Vector2.ONE
+	stuck.global_position = player.global_position + offset
+	field._activate_asteroid(stuck)
+	stuck.configure_steering(
+		player,
+		offset,
+		field._slow_zone_radius,
+		field.slow_zone_blend,
+		100.0,
+		100.0,
+		field.drift_strength,
+		field.steer_strength,
+		1.0,
+		0.6
+	)
+	if stuck.velocity.length() <= 0.01:
+		failures.append("asteroid_field: steering can stall at target position")
+	field._deactivate_asteroid(stuck)
+	stuck.queue_free()
+
+	var ballistic: Asteroid = field._create_asteroid()
+	ballistic.configure_motion(Vector2.ZERO, 0.0)
+	ballistic._scale_initialized = true
+	ballistic.scale = Vector2.ONE
+	ballistic.global_position = player.global_position + Vector2(600, 0)
+	field._activate_asteroid(ballistic)
+	ballistic.configure_steering(
+		player,
+		Vector2(200, 0),
+		field._slow_zone_radius,
+		field.slow_zone_blend,
+		100.0,
+		100.0,
+		field.drift_strength,
+		field.steer_strength,
+		1.0,
+		0.0
+	)
+	var dir1 := ballistic._get_desired_velocity().normalized()
+	ballistic.global_position += Vector2(0, 200)
+	var dir2 := ballistic._get_desired_velocity().normalized()
+	if dir1.dot(dir2) < 0.999:
+		failures.append("asteroid_field: flyby direction changes with position")
+	field._deactivate_asteroid(ballistic)
+	ballistic.queue_free()
+
+	await get_tree().process_frame
+	var s1: float = field._pick_spawn_scale(0.05)
+	if s1 < field.spawn_scale_tier_small.x or s1 > field.spawn_scale_tier_small.y:
+		failures.append("asteroid_field: tier1 scale out of range")
+	var s2: float = field._pick_spawn_scale(0.25)
+	if s2 < field.spawn_scale_tier_once.x or s2 > field.spawn_scale_tier_once.y:
+		failures.append("asteroid_field: tier2 scale out of range")
+	var s3: float = field._pick_spawn_scale(0.9)
+	if s3 < field.spawn_scale_tier_multi.x or s3 > field.spawn_scale_tier_multi.y:
+		failures.append("asteroid_field: tier3 scale out of range")
 
 	game.queue_free()
 	await get_tree().process_frame

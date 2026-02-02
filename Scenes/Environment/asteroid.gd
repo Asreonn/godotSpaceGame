@@ -37,6 +37,7 @@ var _drift_strength := 0.0
 var _steer_strength := 1.0
 var _drift_sign := 1.0
 var _flyby_angle := 0.0
+var _flyby_dir := Vector2.ZERO
 
 func configure_motion(vel: Vector2, rot_speed: float) -> void:
 	velocity = vel
@@ -65,6 +66,7 @@ func configure_steering(
 	_drift_sign = drift_sign
 	_flyby_angle = flyby_angle
 	_steer_enabled = (_steer_target != null)
+	_flyby_dir = _compute_flyby_dir()
 	velocity = _get_desired_velocity()
 
 func setup(tex: Texture2D, base_scale: float, vel: Vector2, rot_speed: float) -> void:
@@ -305,18 +307,33 @@ func _apply_steering(delta: float) -> void:
 	var lerp_t := 1.0 - exp(-_steer_strength * delta)
 	velocity = velocity.lerp(desired, lerp_t)
 
-func _get_desired_velocity() -> Vector2:
+
+func _compute_flyby_dir() -> Vector2:
 	if not _steer_target:
-		return velocity
+		return Vector2.ZERO
 	var target_pos := _steer_target.global_position + _steer_offset
 	var to_target := target_pos - global_position
+	var base_dir: Vector2
 	if to_target.length() <= 0.001:
+		var fallback := global_position - _steer_target.global_position
+		if fallback.length() <= 0.001:
+			fallback = Vector2.RIGHT
+		base_dir = fallback.normalized()
+	else:
+		base_dir = to_target.normalized()
+	base_dir = base_dir.rotated(_flyby_angle)
+	var drift := Vector2(-base_dir.y, base_dir.x) * _drift_strength * _drift_sign
+	var dir := base_dir + drift
+	if dir.length() > 0.001:
+		dir = dir.normalized()
+	return dir
+
+func _get_desired_velocity() -> Vector2:
+	if _flyby_dir.length() <= 0.001:
+		_flyby_dir = _compute_flyby_dir()
+	if _flyby_dir.length() <= 0.001:
 		return velocity
-	var dir := to_target.normalized().rotated(_flyby_angle)
-	var drift := Vector2(-dir.y, dir.x) * _drift_strength * _drift_sign
-	var desired_dir := dir + drift
-	if desired_dir.length() > 0.001:
-		desired_dir = desired_dir.normalized()
+	var desired_dir := _flyby_dir
 	var speed := _slow_speed
 	if absf(_fast_speed - _slow_speed) > 0.01:
 		var dist_to_player := global_position.distance_to(_steer_target.global_position)
