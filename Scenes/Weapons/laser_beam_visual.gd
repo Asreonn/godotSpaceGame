@@ -60,8 +60,8 @@ func _setup_beam_line() -> void:
 	_beam_line.sharp_limit = 8.0
 
 	# Daha yumuşak uzunluk boyunca gradient - 5 nokta
-	_beam_line.gradient = _create_line_gradient()
-	_beam_line.width_curve = _create_width_curve()
+	_beam_line.gradient = BeamVisualCurves.create_line_gradient()
+	_beam_line.width_curve = BeamVisualCurves.create_width_curve()
 
 	_beam_line.points = PackedVector2Array([Vector2.ZERO, Vector2.ZERO])
 
@@ -135,12 +135,12 @@ func _setup_beam_particles() -> void:
 	# Daha küçük, zarif parçacıklar
 	_beam_particles_mat.scale_min = 0.15
 	_beam_particles_mat.scale_max = 0.4
-	_beam_particles_mat.scale_curve = _create_beam_scale_curve()
+	_beam_particles_mat.scale_curve = BeamVisualCurves.create_beam_scale_curve()
 
 	_beam_particles_mat.damping_min = 8.0
 	_beam_particles_mat.damping_max = 16.0
 
-	_beam_particles_mat.color_ramp = _create_beam_gradient()
+	_beam_particles_mat.color_ramp = BeamVisualCurves.create_beam_gradient()
 
 	_beam_particles.process_material = _beam_particles_mat
 
@@ -285,80 +285,4 @@ func set_heat_level(heat_ratio: float, overheated: bool, delta: float) -> void:
 			base.a * color.a
 		)
 
-# ── Gradient ve Curve yardımcıları ──────────────────────────────
 
-func _create_beam_scale_curve() -> CurveTexture:
-	var curve := Curve.new()
-	curve.clear_points()
-	# Yumuşak çan eğrisi - yavaş büyü, yavaş küçül
-	curve.add_point(Vector2(0.0, 0.0), 0.0, 2.0)
-	curve.add_point(Vector2(0.3, 0.8), 0.5, 0.2)
-	curve.add_point(Vector2(0.6, 1.0), 0.0, -0.3)
-	curve.add_point(Vector2(1.0, 0.0), -1.5, 0.0)
-	var tex := CurveTexture.new()
-	tex.curve = curve
-	return tex
-
-func _create_casting_scale_curve() -> CurveTexture:
-	var curve := Curve.new()
-	curve.clear_points()
-	# Smooth fade out
-	curve.add_point(Vector2(0.0, 0.3), 0.0, 3.0)
-	curve.add_point(Vector2(0.2, 1.0), 0.0, 0.0)
-	curve.add_point(Vector2(0.6, 0.6), -0.5, -0.5)
-	curve.add_point(Vector2(1.0, 0.0), -1.0, 0.0)
-	var tex := CurveTexture.new()
-	tex.curve = curve
-	return tex
-
-func _create_beam_gradient() -> GradientTexture1D:
-	var gradient := Gradient.new()
-	# 5 noktalı yumuşak geçiş
-	gradient.offsets = PackedFloat32Array([0.0, 0.2, 0.5, 0.8, 1.0])
-	gradient.colors = PackedColorArray([
-		Color(0.85, 0.7, 1.0, 0.7),   # Başlangıç - yumuşak lavanta
-		Color(0.75, 0.55, 0.95, 0.55), # Erken orta
-		Color(0.6, 0.4, 0.85, 0.35),   # Orta - solmaya başlıyor
-		Color(0.45, 0.25, 0.7, 0.15),  # Geç orta
-		Color(0.3, 0.15, 0.5, 0.0)     # Bitiş - tamamen şeffaf
-	])
-	var tex := GradientTexture1D.new()
-	tex.gradient = gradient
-	return tex
-
-func _create_muzzle_gradient() -> GradientTexture1D:
-	var gradient := Gradient.new()
-	gradient.offsets = PackedFloat32Array([0.0, 0.15, 0.4, 0.7, 1.0])
-	gradient.colors = PackedColorArray([
-		Color(1.0, 0.9, 1.0, 0.95),    # Baslangic - parlak beyaz-lavanta
-		Color(0.9, 0.75, 1.0, 0.8),    # Erken
-		Color(0.8, 0.6, 0.95, 0.55),   # Orta
-		Color(0.6, 0.4, 0.8, 0.25),    # Gec
-		Color(0.4, 0.2, 0.6, 0.0)      # Bitis
-	])
-	var tex := GradientTexture1D.new()
-	tex.gradient = gradient
-	return tex
-
-func _create_line_gradient() -> Gradient:
-	var gradient := Gradient.new()
-	# Beam boyunca parlak renk gecisi
-	gradient.offsets = PackedFloat32Array([0.0, 0.1, 0.4, 0.75, 1.0])
-	gradient.colors = PackedColorArray([
-		Color(1.0, 0.9, 1.0, 1.0),     # Muzzle - beyaz-parlak
-		Color(0.9, 0.7, 1.0, 0.95),    # Erken - parlak lavanta
-		Color(0.8, 0.6, 0.95, 0.8),    # Orta
-		Color(0.65, 0.45, 0.85, 0.45), # Gec
-		Color(0.5, 0.3, 0.7, 0.0)      # Uc - kaybolma
-	])
-	return gradient
-
-func _create_width_curve() -> Curve:
-	# Beam genişliği: başta ince, ortada normal, uçta sivrilen
-	var curve := Curve.new()
-	curve.clear_points()
-	curve.add_point(Vector2(0.0, 0.7), 0.0, 1.0)
-	curve.add_point(Vector2(0.15, 1.0), 0.3, 0.0)
-	curve.add_point(Vector2(0.7, 1.0), 0.0, -0.3)
-	curve.add_point(Vector2(1.0, 0.3), -1.5, 0.0)
-	return curve
