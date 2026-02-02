@@ -1,6 +1,8 @@
 class_name ModularBaseManager
 extends Node2D
 
+const BASE_MODULE_SCENE := preload("res://Scenes/Base/base_module.tscn")
+
 ## Modüler base sistemini yoneten merkezi sinif.
 ## Grid bazli modul yerlestirme, baglanti guncelleme ve build islemlerini yonetir.
 
@@ -120,7 +122,7 @@ func _place_module_internal(grid_pos: Vector2i, definition: ModuleDefinition) ->
 		return null
 
 	# BaseModule olustur
-	var module := BaseModule.new()
+	var module: BaseModule = BASE_MODULE_SCENE.instantiate()
 	module.setup(grid_pos, definition)
 	module.position = BaseModule.grid_to_world(grid_pos, cell_size)
 	add_child(module)

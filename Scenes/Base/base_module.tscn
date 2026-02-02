@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scenes/Base/base_module.gd" id="1_base_module_script"]
+
+[node name="BaseModule" type="Node2D"]
+script = ExtResource("1_base_module_script")
+
+[node name="Sprite" type="Sprite2D" parent="."]

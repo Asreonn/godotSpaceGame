@@ -2,13 +2,12 @@ extends GPUParticles2D
 
 var _hit_material: ParticleProcessMaterial
 var _miss_material: ParticleProcessMaterial
-var _shockwave_sprite: Sprite2D
+@onready var _shockwave_sprite: Sprite2D = $ShockwaveSprite
 var _shockwave_tween: Tween
 
 func _ready() -> void:
 	_setup_hit_material()
 	_setup_miss_material()
-	_setup_shockwave()
 	one_shot = false
 	emitting = false
 	var glow_mat := CanvasItemMaterial.new()
@@ -99,21 +98,6 @@ func pulse() -> void:
 		emitting = true
 	restart()
 	_trigger_shockwave()
-
-func _setup_shockwave() -> void:
-	_shockwave_sprite = Sprite2D.new()
-	add_child(_shockwave_sprite)
-
-	_shockwave_sprite.texture = load("res://Assets/Weapons/glowing_circle.png")
-
-	var shockwave_mat := CanvasItemMaterial.new()
-	shockwave_mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-	_shockwave_sprite.material = shockwave_mat
-
-	# Daha yumuşak başlangıç rengi
-	_shockwave_sprite.modulate = Color(0.8, 0.65, 0.95, 0.0)
-	_shockwave_sprite.scale = Vector2.ZERO
-	_shockwave_sprite.z_index = -1
 
 func _trigger_shockwave() -> void:
 	if _shockwave_tween and _shockwave_tween.is_running():

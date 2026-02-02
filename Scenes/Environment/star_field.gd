@@ -65,13 +65,7 @@ func _get_layers() -> Array[ParallaxLayer]:
 	return layers
 
 func _get_or_create_container(layer: ParallaxLayer) -> Node2D:
-	var container := layer.get_node_or_null("Stars")
-	if container is Node2D:
-		return container as Node2D
-	container = Node2D.new()
-	container.name = "Stars"
-	layer.add_child(container)
-	return container
+	return layer.get_node("Stars") as Node2D
 
 func _spawn_stars(
 		container: Node2D,
