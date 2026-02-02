@@ -14,14 +14,17 @@ extends CanvasLayer
 @export var pulse_speed := 8.0
 @export var overheat_pulse_speed := 12.0
 
-@export var laser_beam: LaserBeam
-@export var inventory_ui: InventoryUI
+@export var laser_beam_path: NodePath
+@export var inventory_ui_path: NodePath
 
 @onready var _root: Control = $Root
 @onready var _ring: Node2D = $Root/Ring
 @onready var _ring_bg: Line2D = $Root/Ring/RingBg
 @onready var _ring_fill: Line2D = $Root/Ring/RingFill
 @onready var _status_label: Label = $Root/StatusLabel
+
+@onready var _laser_beam: LaserBeam = get_node_or_null(laser_beam_path)
+@onready var _inventory_ui: InventoryUI = get_node_or_null(inventory_ui_path)
 
 var _mouse_hidden := false
 var _pulse_time := 0.0
@@ -55,10 +58,10 @@ func _update_ring(delta: float, mouse_pos: Vector2) -> void:
 	var overheated: bool = false
 	var cooldown_progress: float = 0.0
 
-	if laser_beam:
-		heat_ratio = float(laser_beam.get_heat_ratio())
-		overheated = bool(laser_beam.is_overheated())
-		cooldown_progress = float(laser_beam.get_cooldown_progress())
+	if _laser_beam:
+		heat_ratio = float(_laser_beam.get_heat_ratio())
+		overheated = bool(_laser_beam.is_overheated())
+		cooldown_progress = float(_laser_beam.get_cooldown_progress())
 
 	var ratio: float = heat_ratio
 	var color: Color = ring_cool_color.lerp(ring_hot_color, clampf(heat_ratio, 0.0, 1.0))
@@ -135,9 +138,9 @@ func _build_arc_points(radius: float, ratio: float, segments: int) -> PackedVect
 	return pts
 
 func _is_mouse_over_ui(mouse_pos: Vector2) -> bool:
-	if not inventory_ui:
+	if not _inventory_ui:
 		return false
-	return inventory_ui.is_mouse_over_ui(mouse_pos)
+	return _inventory_ui.is_mouse_over_ui(mouse_pos)
 
 func _set_mouse_hidden(hidden: bool) -> void:
 	if hidden == _mouse_hidden:

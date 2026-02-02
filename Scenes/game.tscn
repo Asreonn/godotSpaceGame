@@ -53,7 +53,7 @@ player = NodePath("../Player")
 
 [node name="SmoothCamera" type="Camera2D" parent="." unique_id=891574962]
 script = ExtResource("4_smoothcam")
-target = NodePath("../Player")
+target_path = NodePath("../Player")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2077198092]
 environment = SubResource("Environment_3dryh")
@@ -75,5 +75,5 @@ position = Vector2(560, 240)
 [node name="InventoryUI" parent="." unique_id=1054532267 instance=ExtResource("9_invui")]
 
 [node name="BeamHeatCursor" parent="." instance=ExtResource("10_heatcursor")]
-laser_beam = NodePath("../Player/LaserBeam")
-inventory_ui = NodePath("../InventoryUI")
+laser_beam_path = NodePath("../Player/LaserBeam")
+inventory_ui_path = NodePath("../InventoryUI")
