@@ -156,20 +156,14 @@ func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		_player_inside = true
 		_player_ref = body
-		if body.has_method("set_nearby_base"):
-			body.set_nearby_base(self)
-		if body.has_method("set_beam_enabled"):
-			body.set_beam_enabled(false)
+		Events.player_entered_base_station.emit(self, body)
 		player_entered.emit(self)
 
 func _on_body_exited(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		_player_inside = false
 		_player_ref = null
-		if body.has_method("set_nearby_base"):
-			body.set_nearby_base(null)
-		if body.has_method("set_beam_enabled"):
-			body.set_beam_enabled(true)
+		Events.player_exited_base_station.emit(self, body)
 
 		# Build modundan cik
 		if _build_mode_active:

@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+Events="*res://events.gd"
 ItemDB="*res://Scenes/Inventory/item_database.gd"
 
 [display]
