@@ -127,6 +127,7 @@ offset_top = 0.0
 offset_right = 0.0
 offset_bottom = 0.0
 script = ExtResource("2_root_script")
+inventory_ui = NodePath("..")
 
 [node name="ShipPanel" parent="Root" instance=ExtResource("3_panel")]
 anchor_left = 0.0

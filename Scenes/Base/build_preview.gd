@@ -150,12 +150,12 @@ func _create_slot_indicators() -> void:
 		_manager.add_child(indicator)
 
 func _create_single_indicator(grid_pos: Vector2i) -> Node2D:
-	var node := SLOT_INDICATOR_SCENE.instantiate() as Node2D
+	var node := SLOT_INDICATOR_SCENE.instantiate() as BuildSlotIndicator
 	var world_pos := _manager.grid_to_world(grid_pos)
 	# Indicator'lar _manager'in child'i olarak ekleniyor (global world coords)
 	node.position = world_pos
 
-	var rect := node.get_node("Rect") as ColorRect
+	var rect := node.rect
 
 	# Pulsating animasyon (tween'i manager'a bagla, indicator'in parent'i)
 	var tween := _manager.create_tween()

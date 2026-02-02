@@ -19,8 +19,9 @@ func _process(_delta: float) -> void:
 		var players := get_tree().get_nodes_in_group("player")
 		if not players.is_empty():
 			var player = players[0]
-			if player.has_node("ShipInventory"):
-				_inventory = player.get_node("ShipInventory") as InventoryComponent
+			var inv := player.get_inventory()
+			if inv:
+				_inventory = inv
 				_inventory.changed.connect(_update_display)
 				_update_display()
 		return
@@ -66,10 +67,7 @@ func _update_display() -> void:
 	_items_label.text = items_text
 
 func _get_db() -> ItemDatabase:
-	var tree := get_tree()
-	if tree and tree.root.has_node("ItemDB"):
-		return tree.root.get_node("ItemDB") as ItemDatabase
-	return null
+	return ItemDB
 
 func _apply_bar_style(used: int, max_value: int) -> void:
 	var ratio := 0.0 if max_value <= 0 else float(used) / float(max_value)

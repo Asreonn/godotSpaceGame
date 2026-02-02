@@ -181,9 +181,7 @@ func _try_pickup() -> void:
 	if not _target:
 		return
 
-	var inventory: InventoryComponent = null
-	if _target.has_node("ShipInventory"):
-		inventory = _target.get_node("ShipInventory") as InventoryComponent
+	var inventory: InventoryComponent = _target.get_inventory()
 
 	if not inventory:
 		return
@@ -202,9 +200,4 @@ func _try_pickup() -> void:
 		tween.tween_callback(queue_free)
 
 func _get_db() -> ItemDatabase:
-	var tree := get_tree()
-	if tree:
-		var root := tree.root
-		if root.has_node("ItemDB"):
-			return root.get_node("ItemDB") as ItemDatabase
-	return null
+	return ItemDB
