@@ -284,5 +284,3 @@ func set_heat_level(heat_ratio: float, overheated: bool, delta: float) -> void:
 			base.b * color.b,
 			base.a * color.a
 		)
-
-
