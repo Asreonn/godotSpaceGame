@@ -46,6 +46,8 @@ func setup(tex: Texture2D, base_scale: float, vel: Vector2, rot_speed: float) ->
 func _ready() -> void:
 	collision_layer = 2
 	collision_mask = 0
+	Events.laser_damage_requested.connect(_on_laser_damage_requested)
+	Events.laser_impact_pulse_requested.connect(_on_laser_impact_pulse_requested)
 	if not _scale_initialized:
 		var raw_scale: float = scale.x
 		scale *= size_multiplier
@@ -64,6 +66,16 @@ func take_damage(amount: float) -> void:
 	impact_pulse()
 	if current_health <= 0.0:
 		_explode()
+
+func _on_laser_damage_requested(target: Node2D, amount: float) -> void:
+	if target != self:
+		return
+	take_damage(amount)
+
+func _on_laser_impact_pulse_requested(target: Node2D) -> void:
+	if target != self:
+		return
+	impact_pulse()
 
 func _flash_white() -> void:
 	if _flash_tween and _flash_tween.is_running():
