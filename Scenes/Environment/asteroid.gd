@@ -2,7 +2,6 @@ extends Area2D
 class_name Asteroid
 
 const EXPLOSION_SCENE := preload("res://Scenes/VFX/asteroid_explosion.tscn")
-const ITEM_DROP_SCENE := preload("res://Scenes/Items/item_drop.tscn")
 
 signal destroyed(asteroid: Asteroid)
 
@@ -15,9 +14,7 @@ var current_health: float = 100
 var generation := 0  # 0=orijinal, 1=birinci parça, 2=ikinci parça
 var _scale_initialized := false
 
-# Parçalanma sabitleri
-const MAX_GENERATION := 2
-const MIN_FRAGMENT_SCALE := 0.35  # Bu altındakiler parçalanmaz (küçültülmüş)
+
 
 @onready var _sprite: Sprite2D = $Sprite2D
 
@@ -139,8 +136,9 @@ func _explode() -> void:
 	_spawn_explosion_particles()
 	_trigger_screen_shake()
 	_play_explosion_sound()  # Placeholder - ses dosyasi eklenince calisacak
-	_spawn_fragments()  # Simdi generation bazli kontrol yapiyor
-	_spawn_item_drops()
+	var scene_root := get_tree().current_scene
+	AsteroidDeathSpawner.spawn_fragments(global_position, scale.x, velocity, generation, _sprite.texture, scene_root)
+	AsteroidDeathSpawner.spawn_item_drops(global_position, scale.x, scene_root)
 	destroyed.emit(self)
 	queue_free()
 
@@ -205,95 +203,6 @@ func _spawn_explosion_particles() -> void:
 	# Doğrudan asteroidin gerçek ekran scale'ini gönder
 	# play() bu değere göre tüm materyal özelliklerini ayarlayacak
 	explosion.play(scale.x)
-
-func _spawn_fragments() -> void:
-	var current_scale := scale.x
-	
-	# Çok küçükse parçalanma
-	if current_scale < MIN_FRAGMENT_SCALE:
-		return
-	
-	# Max generation'a ulaştıysa parçalanma
-	if generation >= MAX_GENERATION:
-		return
-	
-	# Boyuta göre parça sayısı ve boyutu belirle
-	var fragment_count: int
-	var fragment_scale_range: Vector2
-	
-	if current_scale >= 0.9:
-		# BÜYÜK: 2 orta parça
-		fragment_count = 2
-		fragment_scale_range = Vector2(0.55, 0.75)
-	elif current_scale >= 0.5:
-		# ORTA: 2-3 küçük parça
-		fragment_count = randi_range(2, 3)
-		fragment_scale_range = Vector2(0.35, 0.45)
-	else:
-		# Küçük ama yeterince büyük: 2 mini parça
-		fragment_count = 2
-		fragment_scale_range = Vector2(0.25, 0.35)
-	
-	# Parçaları spawn et
-	var tex := _sprite.texture
-	var scene := load("res://Scenes/Environment/asteroid.tscn") as PackedScene
-	
-	var angle_step := TAU / float(fragment_count)
-	
-	for i in fragment_count:
-		var fragment := scene.instantiate()
-		
-		var angle := angle_step * i + randf_range(-0.4, 0.4)
-		var frag_vel := velocity + Vector2.from_angle(angle) * randf_range(70.0, 140.0)
-		var frag_scale := randf_range(fragment_scale_range.x, fragment_scale_range.y)
-		var frag_rot := randf_range(-1.2, 1.2)
-		
-		fragment.setup(tex, frag_scale, frag_vel, frag_rot)
-		fragment.generation = generation + 1  # Bir sonraki generation
-		fragment.global_position = global_position + Vector2.from_angle(angle) * 20.0
-		fragment.add_to_group("asteroid_active")
-		
-		get_tree().current_scene.add_child(fragment)
-
-func _spawn_item_drops() -> void:
-	var scene := get_tree().current_scene
-	if not scene:
-		return
-
-	var current_scale := scale.x
-
-	# Kucuk asteroidler drop vermez
-	if current_scale < 0.3:
-		return
-
-	# Sabit drop tablosu: her asteroid iron ve/veya gold dusurur
-	# Miktar asteroid scale ile orantili
-	var drop_count := 1
-	if current_scale >= 0.8:
-		drop_count = randi_range(2, 3)
-	elif current_scale >= 0.5:
-		drop_count = randi_range(1, 2)
-
-	for i in drop_count:
-		var drop: Area2D = ITEM_DROP_SCENE.instantiate()
-
-		# Esit oran: %50 Iron, %50 Gold
-		var roll := randf()
-		var item_id: String
-		if roll < 0.5:
-			item_id = "iron"
-		else:
-			item_id = "gold"
-
-		# Miktar: scale bazli 1-3
-		var amount := 1
-		if current_scale >= 0.9:
-			amount = randi_range(2, 3)
-		elif current_scale >= 0.6:
-			amount = randi_range(1, 2)
-
-		drop.setup(item_id, amount, global_position)
-		scene.add_child(drop)
 
 func _process(delta: float) -> void:
 	_apply_steering(delta)
