@@ -55,12 +55,9 @@ func _update_ring(delta: float, mouse_pos: Vector2) -> void:
 	var cooldown_progress: float = 0.0
 
 	if _laser_beam:
-		if _laser_beam.has_method("get_heat_ratio"):
-			heat_ratio = float(_laser_beam.get_heat_ratio())
-		if _laser_beam.has_method("is_overheated"):
-			overheated = bool(_laser_beam.is_overheated())
-		if _laser_beam.has_method("get_cooldown_progress"):
-			cooldown_progress = float(_laser_beam.get_cooldown_progress())
+		heat_ratio = float(_laser_beam.get_heat_ratio())
+		overheated = bool(_laser_beam.is_overheated())
+		cooldown_progress = float(_laser_beam.get_cooldown_progress())
 
 	var ratio: float = heat_ratio
 	var color: Color = ring_cool_color.lerp(ring_hot_color, clampf(heat_ratio, 0.0, 1.0))
