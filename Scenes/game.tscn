@@ -45,7 +45,7 @@ player_path = NodePath("../Player")
 
 [node name="AsteroidField" type="Node2D" parent="." unique_id=630363580]
 script = ExtResource("5_asteroidfield")
-player = NodePath("../Player")
+player_path = NodePath("../Player")
 
 [node name="Asteroids" type="Node2D" parent="AsteroidField" unique_id=1908113782]
 
