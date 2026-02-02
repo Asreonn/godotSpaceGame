@@ -1,4 +1,5 @@
 extends Node2D
+class_name LaserBeam
 
 @export var max_range := 500.0
 @export var damage_per_second := 10.0

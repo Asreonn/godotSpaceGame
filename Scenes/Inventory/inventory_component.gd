@@ -154,12 +154,4 @@ func set_max_capacity(new_max: int) -> void:
 # --- Yardimci ---
 
 func _get_db() -> ItemDatabase:
-	if Engine.has_singleton("ItemDB"):
-		return Engine.get_singleton("ItemDB")
-	# Autoload node olarak ara
-	var tree := get_tree()
-	if tree:
-		var root := tree.root
-		if root.has_node("ItemDB"):
-			return root.get_node("ItemDB") as ItemDatabase
-	return null
+	return ItemDB

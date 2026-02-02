@@ -45,7 +45,7 @@ player_path = NodePath("../Player")
 
 [node name="AsteroidField" type="Node2D" parent="." unique_id=630363580]
 script = ExtResource("5_asteroidfield")
-player_path = NodePath("../Player")
+player = NodePath("../Player")
 
 [node name="Asteroids" type="Node2D" parent="AsteroidField" unique_id=1908113782]
 
@@ -53,7 +53,7 @@ player_path = NodePath("../Player")
 
 [node name="SmoothCamera" type="Camera2D" parent="." unique_id=891574962]
 script = ExtResource("4_smoothcam")
-target_path = NodePath("../Player")
+target = NodePath("../Player")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2077198092]
 environment = SubResource("Environment_3dryh")
@@ -75,3 +75,5 @@ position = Vector2(560, 240)
 [node name="InventoryUI" parent="." unique_id=1054532267 instance=ExtResource("9_invui")]
 
 [node name="BeamHeatCursor" parent="." instance=ExtResource("10_heatcursor")]
+laser_beam = NodePath("../Player/LaserBeam")
+inventory_ui = NodePath("../InventoryUI")

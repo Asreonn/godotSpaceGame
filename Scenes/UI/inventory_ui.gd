@@ -48,6 +48,7 @@ var _split_bar_label: Label = null  # miktar yazisi
 @onready var _ship_panel: PanelContainer = $Root/ShipPanel
 @onready var _base_panel: PanelContainer = $Root/BasePanel
 @onready var _action_panel: PanelContainer = $Root/ActionPanel
+@onready var _action_buttons: HBoxContainer = $Root/ActionPanel/Actions
 @onready var _ship_list: VBoxContainer = $Root/ShipPanel/Content/ListScroll/List
 @onready var _ship_cap_label: Label = $Root/ShipPanel/Content/Header/HeaderRow/CapLabel
 @onready var _ship_cap_bar: ProgressBar = $Root/ShipPanel/Content/CapBar/CapProgress
@@ -90,14 +91,13 @@ func _connect_player() -> void:
 		return
 	if _player != player:
 		_player = player
-	if player.has_node("ShipInventory"):
-		var inv := player.get_node("ShipInventory") as InventoryComponent
-		if inv and inv != _ship_inventory:
-			if _ship_inventory and _ship_inventory.changed.is_connected(_refresh_ui):
-				_ship_inventory.changed.disconnect(_refresh_ui)
-			_ship_inventory = inv
-			if not _ship_inventory.changed.is_connected(_refresh_ui):
-				_ship_inventory.changed.connect(_refresh_ui)
+	var inv := player.get_inventory()
+	if inv and inv != _ship_inventory:
+		if _ship_inventory and _ship_inventory.changed.is_connected(_refresh_ui):
+			_ship_inventory.changed.disconnect(_refresh_ui)
+		_ship_inventory = inv
+		if not _ship_inventory.changed.is_connected(_refresh_ui):
+			_ship_inventory.changed.connect(_refresh_ui)
 	_refresh_ui()
 
 func _connect_bases() -> void:
@@ -131,10 +131,9 @@ func _open_with_base(player: Node2D, base: BaseStation) -> void:
 	_player = player
 	_base_station = base
 
-	if player.has_node("ShipInventory"):
-		_ship_inventory = player.get_node("ShipInventory") as InventoryComponent
-		if not _ship_inventory.changed.is_connected(_refresh_ui):
-			_ship_inventory.changed.connect(_refresh_ui)
+	_ship_inventory = player.get_inventory()
+	if _ship_inventory and not _ship_inventory.changed.is_connected(_refresh_ui):
+		_ship_inventory.changed.connect(_refresh_ui)
 
 	_base_inventory = base.get_inventory()
 	if _base_inventory and not _base_inventory.changed.is_connected(_refresh_ui):
@@ -581,6 +580,15 @@ func _get_drop_target(screen_pos: Vector2) -> String:
 		return "none"
 	return "world"
 
+func is_mouse_over_ui(mouse_pos: Vector2) -> bool:
+	if _ship_panel.get_global_rect().has_point(mouse_pos):
+		return true
+	if _base_panel.visible and _base_panel.get_global_rect().has_point(mouse_pos):
+		return true
+	if _action_panel.visible and _action_panel.get_global_rect().has_point(mouse_pos):
+		return true
+	return false
+
 func _transfer_item(source: InventoryComponent, target: InventoryComponent, item_id: String) -> void:
 	if not source or not target:
 		return
@@ -732,12 +740,7 @@ func _screen_to_world(screen_pos: Vector2) -> Vector2:
 	return canvas.affine_inverse() * screen_pos
 
 func _get_db() -> ItemDatabase:
-	var tree := get_tree()
-	if tree:
-		var root := tree.root
-		if root.has_node("ItemDB"):
-			return root.get_node("ItemDB") as ItemDatabase
-	return null
+	return ItemDB
 
 func _update_root_pivot() -> void:
 	_root.pivot_offset = _root.size * 0.5
@@ -809,11 +812,6 @@ func _apply_button_state(button: Button, disabled: bool) -> void:
 	button.modulate = Color(1, 1, 1, 0.5) if disabled else Color(1, 1, 1, 1)
 
 func _get_player() -> Node2D:
-	var tree := get_tree()
-	if tree and tree.current_scene:
-		var scene_player := tree.current_scene.get_node_or_null("Player")
-		if scene_player:
-			return scene_player as Node2D
 	var players := get_tree().get_nodes_in_group("player")
 	if players.is_empty():
 		return null
@@ -825,8 +823,7 @@ func _get_player() -> Node2D:
 
 func _create_build_button() -> void:
 	# ActionPanel'in Actions HBox'ina Build butonu ekle
-	var actions := _action_panel.get_node_or_null("Actions")
-	if not actions:
+	if not _action_buttons:
 		return
 
 	_btn_build = Button.new()
@@ -865,7 +862,7 @@ func _create_build_button() -> void:
 	_btn_build.pressed.connect(_on_build_pressed)
 
 	# Close butonundan once ekle
-	actions.add_child(_btn_build)
+	_action_buttons.add_child(_btn_build)
 	actions.move_child(_btn_build, 0)
 
 func _on_build_pressed() -> void:

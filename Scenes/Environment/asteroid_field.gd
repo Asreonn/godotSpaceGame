@@ -12,7 +12,7 @@ const ASTEROID_SCENE := preload("res://Scenes/Environment/asteroid.tscn")
 @export var speed_range := Vector2(20.0, 60.0)
 @export var rotation_speed_range := Vector2(-0.3, 0.3)
 @export var scale_range := Vector2(0.4, 1.2)
-@export var player_path: NodePath
+@export var player: Node2D
 
 var _active_asteroids: Array[Asteroid] = []
 var _pool: Array[Asteroid] = []
@@ -24,7 +24,7 @@ var _distance_check_timer := 0.0
 
 func _ready() -> void:
 	_rng.randomize()
-	_player = get_node(player_path)
+	_player = player
 	_build_pool(initial_pool_size)
 
 func _process(delta: float) -> void:
