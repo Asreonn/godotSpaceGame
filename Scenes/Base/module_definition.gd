@@ -57,8 +57,8 @@ func has_direction(dir: Vector2i) -> bool:
 	return dir in available_directions
 
 ## Verilen item id ve miktara gore build edilebilir mi?
-func can_afford(inventory: Node) -> bool:
-	if not inventory or not inventory.has_method("get_item_count"):
+func can_afford(inventory: InventoryComponent) -> bool:
+	if inventory == null:
 		return false
 	for item_id in build_cost.keys():
 		var needed: int = build_cost[item_id]
@@ -68,10 +68,8 @@ func can_afford(inventory: Node) -> bool:
 	return true
 
 ## Build maliyetini envanterden dus
-func spend_cost(inventory: Node) -> bool:
+func spend_cost(inventory: InventoryComponent) -> bool:
 	if not can_afford(inventory):
-		return false
-	if not inventory.has_method("remove_item"):
 		return false
 	for item_id in build_cost.keys():
 		var needed: int = build_cost[item_id]

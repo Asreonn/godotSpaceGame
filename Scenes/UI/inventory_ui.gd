@@ -10,7 +10,7 @@ const ITEM_ROW_SCRIPT := preload("res://Scenes/UI/inventory_item_row.gd")
 
 var _ship_inventory: InventoryComponent = null
 var _base_inventory: InventoryComponent = null
-var _base_station: Node2D = null
+var _base_station: BaseStation = null
 var _player: Node2D = null
 var _is_open: bool = false
 var _selected_item_id: String = ""
@@ -125,7 +125,7 @@ func _on_base_exited(base: BaseStation) -> void:
 	if base == _base_station:
 		close_ui()
 
-func _open_with_base(player: Node2D, base: Node2D) -> void:
+func _open_with_base(player: Node2D, base: BaseStation) -> void:
 	if _is_open and base == _base_station:
 		return
 	_player = player
@@ -136,10 +136,9 @@ func _open_with_base(player: Node2D, base: Node2D) -> void:
 		if not _ship_inventory.changed.is_connected(_refresh_ui):
 			_ship_inventory.changed.connect(_refresh_ui)
 
-	if base.has_method("get_inventory"):
-		_base_inventory = base.get_inventory()
-		if _base_inventory and not _base_inventory.changed.is_connected(_refresh_ui):
-			_base_inventory.changed.connect(_refresh_ui)
+	_base_inventory = base.get_inventory()
+	if _base_inventory and not _base_inventory.changed.is_connected(_refresh_ui):
+		_base_inventory.changed.connect(_refresh_ui)
 
 	_base_panel.visible = (_base_inventory != null)
 	_action_panel.visible = (_base_inventory != null)
@@ -164,7 +163,7 @@ func close_ui() -> void:
 		_base_inventory.changed.disconnect(_refresh_ui)
 
 	# Build UI'yi de kapat
-	if _base_station and _base_station.has_method("hide_build_ui"):
+	if _base_station:
 		_base_station.hide_build_ui()
 
 	_base_inventory = null
@@ -873,5 +872,5 @@ func _on_build_pressed() -> void:
 	if not _base_station:
 		return
 	# BaseStation'daki build UI'yi ac
-	if _base_station.has_method("show_build_ui"):
+	if _base_station:
 		_base_station.show_build_ui()
