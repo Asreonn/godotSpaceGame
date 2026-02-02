@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://dla5erscene04"]
 
-[ext_resource type="Script" uid="uid://bla5erbeam001" path="res://Scripts/Weapons/laser_beam.gd" id="1_laser"]
-[ext_resource type="Script" uid="uid://crntbae1m1yon" path="res://Scripts/Weapons/laser_beam_visual.gd" id="2_visual"]
-[ext_resource type="Script" uid="uid://crntaviw137oo" path="res://Scripts/Weapons/laser_impact_effect.gd" id="3_impact"]
+[ext_resource type="Script" uid="uid://bla5erbeam001" path="res://Scenes/Weapons/laser_beam.gd" id="1_laser"]
+[ext_resource type="Script" uid="uid://crntbae1m1yon" path="res://Scenes/Weapons/laser_beam_visual.gd" id="2_visual"]
+[ext_resource type="Script" uid="uid://crntaviw137oo" path="res://Scenes/Weapons/laser_impact_effect.gd" id="3_impact"]
+[ext_resource type="Texture2D" path="res://Assets/Weapons/glowing_circle.png" id="4_glow"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_34mpn"]
 particle_flag_disable_z = true
@@ -11,6 +12,53 @@ gravity = Vector3(0, 0, 0)
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_5x03j"]
 particle_flag_disable_z = true
 gravity = Vector3(0, 0, 0)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="muzzle_grad"]
+offsets = PackedFloat32Array(0.0, 0.3, 0.6, 0.85, 1.0)
+colors = PackedColorArray(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.8, 1.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 0.2, 1.0, 1.0, 1.0, 0.0)
+
+[sub_resource type="GradientTexture1D" id="muzzle_grad_tex"]
+gradient = SubResource("muzzle_grad")
+
+[sub_resource type="Curve" id="muzzle_scale_curve"]
+_data = [Vector2(0, 0.3), 0.0, 3.0, 0, 0, Vector2(0.2, 1.0), 0.0, 0.0, 0, 0, Vector2(0.6, 0.6), -0.5, -0.5, 0, 0, Vector2(1, 0.0), -1.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="muzzle_scale_curve_tex"]
+curve = SubResource("muzzle_scale_curve")
+
+[sub_resource type="ParticleProcessMaterial" id="muzzle_particles_mat"]
+particle_flag_disable_z = true
+emission_shape = 0
+direction = Vector3(1, 0, 0)
+spread = 60.0
+initial_velocity_min = 45.0
+initial_velocity_max = 120.0
+gravity = Vector3(0, 0, 0)
+damping_min = 10.0
+damping_max = 24.0
+scale_min = 0.3
+scale_max = 0.75
+scale_curve = SubResource("muzzle_scale_curve_tex")
+color_ramp = SubResource("muzzle_grad_tex")
+
+[sub_resource type="ParticleProcessMaterial" id="collision_particles_mat"]
+particle_flag_disable_z = true
+emission_shape = 0
+direction = Vector3(1, 0, 0)
+spread = 65.0
+initial_velocity_min = 35.0
+initial_velocity_max = 110.0
+gravity = Vector3(0, 0, 0)
+damping_min = 12.0
+damping_max = 28.0
+scale_min = 0.35
+scale_max = 0.8
+scale_curve = SubResource("muzzle_scale_curve_tex")
+color_ramp = SubResource("muzzle_grad_tex")
 
 [node name="LaserBeam" type="Node2D" unique_id=1928955507]
 z_index = 1
@@ -27,6 +75,15 @@ collide_with_bodies = false
 [node name="LaserBeamVisual" type="Node2D" parent="." unique_id=476956674]
 script = ExtResource("2_visual")
 
+[node name="BeamGlow" type="Line2D" parent="LaserBeamVisual"]
+show_behind_parent = true
+width = 28.0
+default_color = Color(0.5, 0.3, 0.8, 0.25)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+antialiased = true
+
 [node name="BeamLine" type="Line2D" parent="LaserBeamVisual" unique_id=2013160485]
 modulate = Color(1.5, 1.5, 1.5, 1)
 width = 8.0
@@ -42,14 +99,31 @@ process_material = SubResource("ParticleProcessMaterial_34mpn")
 
 [node name="MuzzleEffect" type="GPUParticles2D" parent="LaserBeamVisual" unique_id=364457319]
 emitting = false
-process_material = SubResource("ParticleProcessMaterial_34mpn")
+amount = 28
+lifetime = 0.4
+modulate = Color(1, 1, 1, 1)
+show_behind_parent = false
+visibility_rect = Rect2(-200, -200, 400, 400)
+local_coords = true
+process_material = SubResource("muzzle_particles_mat")
+material = SubResource("CanvasItemMaterial_add")
+texture = ExtResource("4_glow")
 
 [node name="CollisionParticles" type="GPUParticles2D" parent="LaserBeamVisual" unique_id=1129224119]
 emitting = false
-process_material = SubResource("ParticleProcessMaterial_34mpn")
+amount = 34
+lifetime = 0.55
+modulate = Color(1, 1, 1, 1)
+show_behind_parent = false
+visibility_rect = Rect2(-2500, -2500, 5000, 5000)
+top_level = true
+local_coords = false
+process_material = SubResource("collision_particles_mat")
+material = SubResource("CanvasItemMaterial_add")
+texture = ExtResource("4_glow")
 
 [node name="ImpactEffect" type="GPUParticles2D" parent="." unique_id=672002934]
-position = Vector2(0, -19)
+top_level = true
 emitting = false
 process_material = SubResource("ParticleProcessMaterial_5x03j")
 script = ExtResource("3_impact")

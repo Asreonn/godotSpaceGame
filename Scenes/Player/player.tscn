@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://bon0pgrw321t6"]
 
-[ext_resource type="Script" uid="uid://dxdjbn8cs3uuc" path="res://Scripts/Player/player_movement.gd" id="1_cvnsp"]
+[ext_resource type="Script" uid="uid://dxdjbn8cs3uuc" path="res://Scenes/Player/player_movement.gd" id="1_cvnsp"]
 [ext_resource type="Texture2D" uid="uid://b8n41be76b41u" path="res://Assets/Player/PlayerGFX.png" id="1_f50pn"]
 [ext_resource type="PackedScene" uid="uid://dla5erscene04" path="res://Scenes/Weapons/laser_beam.tscn" id="3_laser"]
+[ext_resource type="Script" uid="uid://cf3p8mvmd3nfk" path="res://Scenes/Inventory/inventory_component.gd" id="4_inventory"]
 
 [node name="Player" type="CharacterBody2D" unique_id=1817178464]
 light_mask = 3
@@ -11,11 +12,14 @@ script = ExtResource("1_cvnsp")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1435229646]
 modulate = Color(0.24585843, 0.635327, 0.8496578, 1)
-scale = Vector2(0.2, 0.2)
+texture_filter = 2
 texture = ExtResource("1_f50pn")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1247993346]
-polygon = PackedVector2Array(17, 16, 1, -18, -17, 16)
+polygon = PackedVector2Array(25, 26, 0, -28, -25, 26)
 
 [node name="LaserBeam" parent="." unique_id=165397461 instance=ExtResource("3_laser")]
-position = Vector2(0, -25)
+position = Vector2(0, -34)
+
+[node name="ShipInventory" type="Node" parent="." unique_id=1120821759]
+script = ExtResource("4_inventory")

@@ -1,35 +1,35 @@
 [gd_scene format=3 uid="uid://bonm5vusaahfb"]
 
 [ext_resource type="PackedScene" uid="uid://bon0pgrw321t6" path="res://Scenes/Player/player.tscn" id="1_ebmjs"]
-[ext_resource type="PackedScene" uid="uid://cb7rf7ls32wb5" path="res://Scenes/Environment/asteroid.tscn" id="2_asteroid"]
-[ext_resource type="Script" uid="uid://cdj0v7hdbvhdu" path="res://Scripts/Environment/star_field.gd" id="3_starfield"]
-[ext_resource type="Script" uid="uid://kpl16pjr0lvs" path="res://Scripts/Camera/smooth_camera.gd" id="4_smoothcam"]
-[ext_resource type="Script" uid="uid://dm7hcsjw28pw5" path="res://Scripts/Environment/asteroid_field.gd" id="5_asteroidfield"]
+[ext_resource type="Script" uid="uid://cdj0v7hdbvhdu" path="res://Scenes/Environment/star_field.gd" id="3_starfield"]
+[ext_resource type="Script" uid="uid://kpl16pjr0lvs" path="res://Scenes/Camera/smooth_camera.gd" id="4_smoothcam"]
+[ext_resource type="Script" uid="uid://dm7hcsjw28pw5" path="res://Scenes/Environment/asteroid_field.gd" id="5_asteroidfield"]
+[ext_resource type="Script" uid="uid://3bfun4kwm1tp" path="res://Scenes/UI/ui_panel_follow.gd" id="7_uifollow"]
+[ext_resource type="PackedScene" path="res://Scenes/Base/base_station.tscn" id="8_base"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/inventory_ui.tscn" id="9_invui"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/beam_heat_cursor.tscn" id="10_heatcursor"]
 
 [sub_resource type="Environment" id="Environment_3dryh"]
 glow_enabled = true
-glow_intensity = 0.8
-glow_strength = 1.2
-glow_bloom = 0.3
+glow_intensity = 1.0
+glow_strength = 1.4
+glow_bloom = 0.4
 glow_blend_mode = 0
+
+[sub_resource type="StyleBoxFlat" id="UIPanel_style"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0, 0, 0, 0)
+
 
 [node name="Game" type="Node2D" unique_id=1416389338]
 
 [node name="StarField" type="ParallaxBackground" parent="." unique_id=1405674122]
 layer = -1
-scroll_ignore_camera_zoom = true
 script = ExtResource("3_starfield")
 player_path = NodePath("../Player")
-
-[node name="BackgroundColor" type="ColorRect" parent="StarField" unique_id=1681320822]
-z_index = -10
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0.18, 0.12, 0.26, 1)
 
 [node name="LayerFar" type="ParallaxLayer" parent="StarField" unique_id=868756702]
 
@@ -47,27 +47,7 @@ color = Color(0.18, 0.12, 0.26, 1)
 script = ExtResource("5_asteroidfield")
 player_path = NodePath("../Player")
 
-[node name="Asteroids" type="Node2D" parent="AsteroidField"]
-
-[node name="Asteroid1" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
-
-[node name="Asteroid2" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
-
-[node name="Asteroid3" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
-
-[node name="Asteroid4" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
-
-[node name="Asteroid5" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
-
-[node name="Asteroid6" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
-
-[node name="Asteroid7" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
-
-[node name="Asteroid8" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
-
-[node name="Asteroid9" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
-
-[node name="Asteroid10" parent="AsteroidField/Asteroids" instance=ExtResource("2_asteroid")]
+[node name="Asteroids" type="Node2D" parent="AsteroidField" unique_id=1908113782]
 
 [node name="Player" parent="." unique_id=1817178464 instance=ExtResource("1_ebmjs")]
 
@@ -77,3 +57,21 @@ target_path = NodePath("../Player")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2077198092]
 environment = SubResource("Environment_3dryh")
+
+[node name="UILayer" type="CanvasLayer" parent="." unique_id=936699779]
+layer = 100
+
+[node name="UIPanel" type="PanelContainer" parent="UILayer" unique_id=1138670786]
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("UIPanel_style")
+script = ExtResource("7_uifollow")
+
+
+[node name="BaseStation" parent="." unique_id=1883240933 instance=ExtResource("8_base")]
+position = Vector2(560, 240)
+
+[node name="InventoryUI" parent="." unique_id=1054532267 instance=ExtResource("9_invui")]
+
+[node name="BeamHeatCursor" parent="." instance=ExtResource("10_heatcursor")]

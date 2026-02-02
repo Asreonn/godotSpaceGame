@@ -1,6 +1,7 @@
 extends Area2D
 
 const EXPLOSION_SCENE := preload("res://Scenes/VFX/asteroid_explosion.tscn")
+const ITEM_DROP_SCENE := preload("res://Scenes/Items/item_drop.tscn")
 
 signal destroyed(asteroid: Area2D)
 
@@ -85,8 +86,9 @@ func impact_pulse() -> void:
 func _explode() -> void:
 	_spawn_explosion_particles()
 	_trigger_screen_shake()
-	_play_explosion_sound()  # Placeholder - ses dosyası eklenince çalışacak
-	_spawn_fragments()  # Şimdi generation bazlı kontrol yapıyor
+	_play_explosion_sound()  # Placeholder - ses dosyasi eklenince calisacak
+	_spawn_fragments()  # Simdi generation bazli kontrol yapiyor
+	_spawn_item_drops()
 	destroyed.emit(self)
 	queue_free()
 
@@ -148,7 +150,7 @@ func _spawn_explosion_particles() -> void:
 		return
 	var explosion := EXPLOSION_SCENE.instantiate()
 	explosion.global_position = global_position
-	explosion.z_index = z_index + 10
+	explosion.z_index = z_index - 1  # Asteroidlerin arkasinda, yildizlarin ustunde
 	scene.add_child(explosion)
 	# Doğrudan asteroidin gerçek ekran scale'ini gönder
 	# play() bu değere göre tüm materyal özelliklerini ayarlayacak
@@ -201,6 +203,46 @@ func _spawn_fragments() -> void:
 		fragment.global_position = global_position + Vector2.from_angle(angle) * 20.0
 		
 		get_tree().current_scene.add_child(fragment)
+
+func _spawn_item_drops() -> void:
+	var scene := get_tree().current_scene
+	if not scene:
+		return
+
+	var current_scale := scale.x
+
+	# Kucuk asteroidler drop vermez
+	if current_scale < 0.3:
+		return
+
+	# Sabit drop tablosu: her asteroid iron ve/veya gold dusurur
+	# Miktar asteroid scale ile orantili
+	var drop_count := 1
+	if current_scale >= 0.8:
+		drop_count = randi_range(2, 3)
+	elif current_scale >= 0.5:
+		drop_count = randi_range(1, 2)
+
+	for i in drop_count:
+		var drop: Area2D = ITEM_DROP_SCENE.instantiate()
+
+		# Esit oran: %50 Iron, %50 Gold
+		var roll := randf()
+		var item_id: String
+		if roll < 0.5:
+			item_id = "iron"
+		else:
+			item_id = "gold"
+
+		# Miktar: scale bazli 1-3
+		var amount := 1
+		if current_scale >= 0.9:
+			amount = randi_range(2, 3)
+		elif current_scale >= 0.6:
+			amount = randi_range(1, 2)
+
+		drop.setup(item_id, amount, global_position)
+		scene.add_child(drop)
 
 func _process(delta: float) -> void:
 	position += velocity * delta

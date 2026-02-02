@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dn043m3ohwmnu"
-path="res://.godot/imported/Player.png-1cdd804a9b0fdcfc546bbabf40de7758.ctex"
+uid="uid://csf3ei8laiywq"
+path="res://.godot/imported/BaseMainSpriteSheet.png-f2a8e8dac94829ecae5c202f01a3dcb7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Player/Player.png"
-dest_files=["res://.godot/imported/Player.png-1cdd804a9b0fdcfc546bbabf40de7758.ctex"]
+source_file="res://Assets/BaseMainSpriteSheet.png"
+dest_files=["res://.godot/imported/BaseMainSpriteSheet.png-f2a8e8dac94829ecae5c202f01a3dcb7.ctex"]
 
 [params]
 
@@ -23,7 +23,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
