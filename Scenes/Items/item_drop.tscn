@@ -15,6 +15,6 @@ script = ExtResource("1_script")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 material = SubResource("GlowMaterial")
-scale = Vector2(0.16, 0.16)
+scale = Vector2(0.24, 0.24)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

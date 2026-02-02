@@ -6,12 +6,12 @@ const ITEM_DROP_SCENE := preload("res://Scenes/Items/item_drop.tscn")
 
 signal destroyed(asteroid: Asteroid)
 
-@export var max_health := 100.0
+@export var max_health: float = 100
 @export var size_multiplier: float = 0.85
 
 var velocity := Vector2.ZERO
 var rotation_speed := 0.0
-var current_health := 100.0
+var current_health: float = 100
 var generation := 0  # 0=orijinal, 1=birinci parça, 2=ikinci parça
 var _scale_initialized := false
 
@@ -26,9 +26,46 @@ var _impact_tween: Tween
 var _fadeout_tween: Tween
 var _is_fading_out := false
 
+var _steer_enabled := false
+var _steer_target: Node2D = null
+var _steer_offset := Vector2.ZERO
+var _slow_speed := 0.0
+var _fast_speed := 0.0
+var _slow_radius := 0.0
+var _slow_blend := 1.0
+var _drift_strength := 0.0
+var _steer_strength := 1.0
+var _drift_sign := 1.0
+var _flyby_angle := 0.0
+
 func configure_motion(vel: Vector2, rot_speed: float) -> void:
 	velocity = vel
 	rotation_speed = rot_speed
+
+func configure_steering(
+			target: Node2D,
+			offset: Vector2,
+			slow_radius: float,
+			slow_blend: float,
+			slow_speed: float,
+			fast_speed: float,
+			drift_strength: float,
+			steer_strength: float,
+			drift_sign: float,
+			flyby_angle: float
+	) -> void:
+	_steer_target = target
+	_steer_offset = offset
+	_slow_radius = maxf(slow_radius, 0.0)
+	_slow_blend = maxf(slow_blend, 1.0)
+	_slow_speed = maxf(slow_speed, 0.0)
+	_fast_speed = maxf(fast_speed, _slow_speed)
+	_drift_strength = drift_strength
+	_steer_strength = maxf(steer_strength, 0.1)
+	_drift_sign = drift_sign
+	_flyby_angle = flyby_angle
+	_steer_enabled = (_steer_target != null)
+	velocity = _get_desired_velocity()
 
 func setup(tex: Texture2D, base_scale: float, vel: Vector2, rot_speed: float) -> void:
 	configure_motion(vel, rot_speed)
@@ -59,7 +96,7 @@ func _apply_health_from_scale(base_scale: float) -> void:
 	var min_scale: float = 0.4
 	var max_scale: float = 1.2
 	var ratio: float = clampf((base_scale - min_scale) / (max_scale - min_scale), 0.0, 1.0)
-	max_health = lerpf(30.0, 120.0, ratio)
+	max_health = roundi(lerpf(20, 100, ratio))
 
 func take_damage(amount: float) -> void:
 	current_health -= amount
@@ -212,6 +249,7 @@ func _spawn_fragments() -> void:
 		fragment.setup(tex, frag_scale, frag_vel, frag_rot)
 		fragment.generation = generation + 1  # Bir sonraki generation
 		fragment.global_position = global_position + Vector2.from_angle(angle) * 20.0
+		fragment.add_to_group("asteroid_active")
 		
 		get_tree().current_scene.add_child(fragment)
 
@@ -256,5 +294,33 @@ func _spawn_item_drops() -> void:
 		scene.add_child(drop)
 
 func _process(delta: float) -> void:
+	_apply_steering(delta)
 	position += velocity * delta
 	rotation += rotation_speed * delta
+
+func _apply_steering(delta: float) -> void:
+	if not _steer_enabled or not _steer_target:
+		return
+	var desired := _get_desired_velocity()
+	var lerp_t := 1.0 - exp(-_steer_strength * delta)
+	velocity = velocity.lerp(desired, lerp_t)
+
+func _get_desired_velocity() -> Vector2:
+	if not _steer_target:
+		return velocity
+	var target_pos := _steer_target.global_position + _steer_offset
+	var to_target := target_pos - global_position
+	if to_target.length() <= 0.001:
+		return velocity
+	var dir := to_target.normalized().rotated(_flyby_angle)
+	var drift := Vector2(-dir.y, dir.x) * _drift_strength * _drift_sign
+	var desired_dir := dir + drift
+	if desired_dir.length() > 0.001:
+		desired_dir = desired_dir.normalized()
+	var speed := _slow_speed
+	if absf(_fast_speed - _slow_speed) > 0.01:
+		var dist_to_player := global_position.distance_to(_steer_target.global_position)
+		var t := clampf((dist_to_player - _slow_radius) / _slow_blend, 0.0, 1.0)
+		var smooth := t * t * (3.0 - 2.0 * t)
+		speed = lerpf(_slow_speed, _fast_speed, smooth)
+	return desired_dir * speed

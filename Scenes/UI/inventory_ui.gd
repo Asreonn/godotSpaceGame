@@ -59,6 +59,7 @@ var _split_bar_label: Label = null  # miktar yazisi
 
 ## Build mode butonu (dinamik olusturulur)
 var _btn_build: Button = null
+var _btn_transfer_all: Button = null
 
 func _ready() -> void:
 	layer = 101
@@ -77,6 +78,7 @@ func _ready() -> void:
 	get_tree().node_added.connect(_on_node_added)
 	_create_carry_preview()
 	_create_split_bar()
+	_create_transfer_all_button()
 	_create_build_button()
 
 func _on_node_added(node: Node) -> void:
@@ -144,6 +146,8 @@ func _open_with_base(player: Node2D, base: BaseStation) -> void:
 	_btn_close.visible = (_base_inventory != null)
 	if _btn_build:
 		_btn_build.visible = (_base_inventory != null)
+	if _btn_transfer_all:
+		_btn_transfer_all.visible = (_base_inventory != null)
 
 	_is_open = true
 	_show_ui()
@@ -158,6 +162,8 @@ func close_ui() -> void:
 	_btn_close.visible = false
 	if _btn_build:
 		_btn_build.visible = false
+	if _btn_transfer_all:
+		_btn_transfer_all.visible = false
 	if _base_inventory and _base_inventory.changed.is_connected(_refresh_ui):
 		_base_inventory.changed.disconnect(_refresh_ui)
 
@@ -608,6 +614,7 @@ func _refresh_ui() -> void:
 		var inv := _ship_inventory if _selected_item_is_ship else _base_inventory
 		if not inv or inv.get_item_count(_selected_item_id) <= 0:
 			_selected_item_id = ""
+	_update_transfer_all_state()
 
 func _refresh_ship_side() -> void:
 	for child in _ship_list.get_children():
@@ -811,11 +818,73 @@ func _apply_button_state(button: Button, disabled: bool) -> void:
 	button.disabled = disabled
 	button.modulate = Color(1, 1, 1, 0.5) if disabled else Color(1, 1, 1, 1)
 
+func _update_transfer_all_state() -> void:
+	if not _btn_transfer_all:
+		return
+	var disabled := true
+	if _ship_inventory and _base_inventory:
+		disabled = _ship_inventory.is_empty() or _base_inventory.is_full()
+	_apply_button_state(_btn_transfer_all, disabled)
+
 func _get_player() -> Node2D:
 	var players := get_tree().get_nodes_in_group("player")
 	if players.is_empty():
 		return null
 	return players[0] as Node2D
+
+# ============================================================
+#  Transfer All
+# ============================================================
+
+func _create_transfer_all_button() -> void:
+	if not _action_buttons:
+		return
+
+	_btn_transfer_all = Button.new()
+	_btn_transfer_all.text = "Transfer All"
+	_btn_transfer_all.custom_minimum_size = Vector2(130, 36)
+	_btn_transfer_all.visible = false
+
+	var style := StyleBoxFlat.new()
+	style.content_margin_left = 14.0
+	style.content_margin_top = 6.0
+	style.content_margin_right = 14.0
+	style.content_margin_bottom = 6.0
+	style.bg_color = Color(0.12, 0.52, 0.26, 0.95)
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	style.border_color = Color(0.2, 0.82, 0.45, 1.0)
+	style.corner_radius_top_left = 8
+	style.corner_radius_top_right = 8
+	style.corner_radius_bottom_right = 8
+	style.corner_radius_bottom_left = 8
+	_btn_transfer_all.add_theme_stylebox_override("normal", style)
+
+	var hover_style := style.duplicate()
+	hover_style.bg_color = Color(0.14, 0.6, 0.3, 0.95)
+	_btn_transfer_all.add_theme_stylebox_override("hover", hover_style)
+
+	var pressed_style := style.duplicate()
+	pressed_style.bg_color = Color(0.08, 0.4, 0.2, 0.95)
+	_btn_transfer_all.add_theme_stylebox_override("pressed", pressed_style)
+
+	_btn_transfer_all.add_theme_color_override("font_color", Color(0.85, 1.0, 0.85))
+	_btn_transfer_all.add_theme_font_size_override("font_size", 13)
+
+	_btn_transfer_all.pressed.connect(_on_transfer_all_pressed)
+
+	_action_buttons.add_child(_btn_transfer_all)
+	_action_buttons.move_child(_btn_transfer_all, 0)
+
+func _on_transfer_all_pressed() -> void:
+	if _carrying or _splitting:
+		return
+	if not _ship_inventory or not _base_inventory:
+		return
+	_ship_inventory.transfer_all_to(_base_inventory)
+	_refresh_ui()
 
 # ============================================================
 #  Build Mode
@@ -863,7 +932,10 @@ func _create_build_button() -> void:
 
 	# Close butonundan once ekle
 	_action_buttons.add_child(_btn_build)
-	_action_buttons.move_child(_btn_build, 0)
+	if _btn_transfer_all:
+		_action_buttons.move_child(_btn_build, 1)
+	else:
+		_action_buttons.move_child(_btn_build, 0)
 
 func _on_build_pressed() -> void:
 	if not _base_station:

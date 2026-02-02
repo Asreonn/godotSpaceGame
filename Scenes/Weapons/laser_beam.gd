@@ -1,13 +1,13 @@
 extends Node2D
 class_name LaserBeam
 
-@export var max_range := 500.0
-@export var damage_per_second := 10.0
-@export var damage_tick_seconds := 1.0
-@export var max_heat := 300.0
-@export var heat_per_second := 33.0
-@export var cooling_rate := 80.0
-@export var overheat_cooldown_duration := 6.0
+@export var max_range := 500
+@export var damage_per_second := 20
+@export var damage_tick_seconds := 1
+@export var max_heat := 120
+@export var heat_per_second := 10
+@export var cooling_rate := 80
+@export var overheat_cooldown_duration := 4
 
 var _firing := false
 var _raycast: RayCast2D
