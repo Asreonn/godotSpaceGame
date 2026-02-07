@@ -8,6 +8,7 @@ signal player_entered(base: BaseStation)
 signal player_exited(base: BaseStation)
 
 @export var trigger_radius: float = 300.0  ## Oyuncunun giris alani (moduler base icin buyutuldu)
+@export var max_health: float = 500.0  ## Base'in maksimum cani
 
 @onready var base_inventory: InventoryComponent = $BaseInventory
 @onready var trigger_area: Area2D = $TriggerArea
@@ -15,6 +16,7 @@ signal player_exited(base: BaseStation)
 
 var _player_inside: bool = false
 var _player_ref: Node2D = null
+var _current_health: float = 500.0
 
 ## Moduler base sistemi
 @onready var _module_manager: ModularBaseManager = $ModuleManager
@@ -24,6 +26,9 @@ var _build_mode_active: bool = false
 
 func _ready() -> void:
 	add_to_group("base_station")
+
+	# Can degerini baslat
+	_current_health = max_health
 
 	# Collision shape'i kod ile olustur
 	var shape := CircleShape2D.new()
@@ -47,6 +52,37 @@ func get_module_manager() -> ModularBaseManager:
 
 func get_build_ui() -> BuildUI:
 	return _build_ui
+
+# -------------------------------------------------------
+#  Can sistemi
+# -------------------------------------------------------
+
+func get_current_health() -> float:
+	return _current_health
+
+func get_max_health() -> float:
+	return max_health
+
+func get_health_ratio() -> float:
+	if max_health <= 0.0:
+		return 0.0
+	return _current_health / max_health
+
+func take_damage(amount: float) -> void:
+	if amount <= 0.0:
+		return
+	_current_health = maxf(0.0, _current_health - amount)
+	Events.base_health_changed.emit(self, _current_health, max_health)
+
+func heal(amount: float) -> void:
+	if amount <= 0.0:
+		return
+	_current_health = minf(max_health, _current_health + amount)
+	Events.base_health_changed.emit(self, _current_health, max_health)
+
+func set_health(value: float) -> void:
+	_current_health = clampf(value, 0.0, max_health)
+	Events.base_health_changed.emit(self, _current_health, max_health)
 
 # -------------------------------------------------------
 #  Moduler sistem kurulumu

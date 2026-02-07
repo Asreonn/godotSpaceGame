@@ -8,6 +8,8 @@
 [ext_resource type="PackedScene" path="res://Scenes/Base/base_station.tscn" id="8_base"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/inventory_ui.tscn" id="9_invui"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/beam_heat_cursor.tscn" id="10_heatcursor"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/base_health_hud.tscn" id="11_healthhud"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/base_info_tooltip.tscn" id="12_infotooltip"]
 
 [sub_resource type="Environment" id="Environment_3dryh"]
 glow_enabled = true
@@ -73,6 +75,10 @@ script = ExtResource("7_uifollow")
 position = Vector2(560, 240)
 
 [node name="InventoryUI" parent="." unique_id=1054532267 instance=ExtResource("9_invui")]
+
+[node name="BaseHealthHUD" parent="." instance=ExtResource("11_healthhud")]
+
+[node name="BaseInfoTooltip" parent="." instance=ExtResource("12_infotooltip")]
 
 [node name="BeamHeatCursor" parent="." instance=ExtResource("10_heatcursor")]
 laser_beam_path = NodePath("../Player/LaserBeam")

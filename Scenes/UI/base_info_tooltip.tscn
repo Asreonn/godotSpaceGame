@@ -1,0 +1,102 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scenes/UI/base_info_tooltip.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+bg_color = Color(0.05, 0.08, 0.12, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.7, 0.9, 0.6)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header"]
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+bg_color = Color(0.07, 0.11, 0.17, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.32, 0.45, 0.5)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_bg"]
+bg_color = Color(0.05, 0.07, 0.1, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.3, 0.4, 0.6)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="BaseInfoTooltip" type="CanvasLayer"]
+layer = 150
+script = ExtResource("1_script")
+
+[node name="Panel" type="PanelContainer" parent="."]
+offset_right = 240.0
+offset_bottom = 70.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Content" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Header" type="PanelContainer" parent="Panel/Content"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_header")
+
+[node name="HeaderRow" type="HBoxContainer" parent="Panel/Content/Header"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="Panel/Content/Header/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Base Station"
+theme_override_colors/font_color = Color(0.85, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 13
+
+[node name="HealthLabel" type="Label" parent="Panel/Content/Header/HeaderRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 0)
+horizontal_alignment = 2
+vertical_alignment = 1
+text = "500 / 500"
+theme_override_colors/font_color = Color(0.7, 0.82, 0.95, 1)
+theme_override_font_sizes/font_size = 11
+
+[node name="HealthBar" type="HBoxContainer" parent="Panel/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 12)
+
+[node name="HealthProgress" type="ProgressBar" parent="Panel/Content/HealthBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 12)
+max_value = 500.0
+value = 500.0
+show_percentage = false
+theme_override_styles/background = SubResource("StyleBoxFlat_progress_bg")
+
+[node name="InfoList" type="VBoxContainer" parent="Panel/Content"]
+layout_mode = 2
+theme_override_constants/separation = 4
